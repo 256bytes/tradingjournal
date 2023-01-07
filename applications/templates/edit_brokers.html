@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+{% block title %}Edit Brokers{% endblock title %}
+
+{% block content %}
+<div class="row mt-3 text-center" id="edit_brokers.html-{{ brokers.id }}"> <!--div row starts-->
+    <div class="col-4"> <!--div first column starts--></div> <!--div first column ends-->
+
+        <div class="col-4 form_bg"> <!--div second column starts-->
+            <table class="table table-dark table-striped table-sm">
+                <thead mt-3><small>Broker Details</small>
+                    <tr>
+                        <th class="scope">Broker Name</th>
+                        <th class="scope">Trading Code</th>
+                        <th class="scope">Equity Delivery</th>
+                        <th class="scope">Equity Intra</th>
+                        <th class="scope">Settings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <form action='./edit_brokers' method="POST" class="form-register mt-2 mb-2"> <!--form starts-->
+                        {{ form.hidden_tag() }}
+
+                        <tr>
+                            <input type="hidden" class="form-control" name="old_name" value="{{ edit_form.name }}">
+                            <td><input type="text" class="form-control" name="new_name" value="{{ edit_form.name }}"></td>
+                            <td>{{ edit_form.update(class="btn btn-primary btn-sm") }}</td>
+                        </tr>
+
+                    </form> <!--form ends-->
+
+                </tbody>
+            </table>
+        </div> <!--div second column ends-->            
+                        
+    <div class="col-4"><!--div third column ends--></div> <!--div third column ends-->
+</div> <!--div row ends-->
+{% endblock content %}

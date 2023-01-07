@@ -1,0 +1,46 @@
+
+  
+<!-- Edit Broker Modal -->
+<div class="modal fade" id="staticBackdrop-{{ brokers.id }}" data-bs-backdrop="static" data-bs-keyboard="false"
+              tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true"> <!--div modal fade starts-->
+
+  <div class="modal-dialog"> <!--div modal-dialog starts-->
+    <div class="modal-content"> <!--div modal-content starts -->
+      <div class="modal-header"> <!--div modal-header starts-->
+        <div><h5 class="modal-title">Broker: {{ brokers.name }}</h5></div>
+        <div><h5 class="modal-title">Code: {{ brokers.trading_code }}</h5></div>
+      </div> <!--div modal-header ends-->
+      <div class="modal-body"> <!--div modal-body starts-->
+        <form method="POST"> <!--form starts-->
+          {{ update_form.hidden_tag() }}
+
+          <div class="mb-3">
+              <label class="col-form-label">Equity Delivery:</label>
+              <input type="hidden" class="form-control" name="old_equity_delivery" value="{{ brokers.equity_delivery }}">
+              <input type="text" class="form-control" name="new_equity_delivery" value="{{ brokers.equity_delivery }}">
+          </div>
+
+          <div class="mb-3">
+            <label class="col-form-label">Equity Intraday:</label>
+            <input type="hidden" class="form-control" name="old_equity_intraday" value="{{ brokers.equity_intraday }}">
+            <input type="text" class="form-control" name="new_equity_intraday" value="{{ brokers.equity_intraday }}">
+          </div>
+
+          <div class="mb-3">
+            <label class="col-form-label">DP Charges:</label>
+            <input type="hidden" class="form-control" name="old_dp_chgs" value="{{ brokers.dp_chgs }}">
+            <input type="text" class="form-control" name="new_dp_chgs" value="{{ brokers.dp_chgs }}">
+          </div>
+
+          <div class="modal-footer">
+            <input type="hidden" class="form-control" name="brokers_id" value="{{ brokers.id }}">
+            {{ update_form.submit(class="btn btn-secondary btn-sm") }}
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+
+        </form> <!--form ends-->
+        
+      </div> <!--div modal-body ends-->
+    </div> <!--div modal-content ends -->
+  </div> <!--div modal-dialog ends-->
+</div> <!--div modal fade ends-->

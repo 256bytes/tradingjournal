@@ -1,0 +1,23 @@
+<!-- Resource Modal -->
+<div class="modal fade" id="resource-{{ analytic.id }}" data-bs-backdrop="static" data-bs-keyboard="false"
+          tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true"> <!--div modal fade starts-->
+  <div class="modal-dialog"> <!--div modal-dialog starts-->
+    <div class="modal-content"> <!--div modal-content starts -->
+      
+      <div class="modal-header"> <!--div modal-header starts-->
+        <div><h5 class="modal-title">Analyst: {{ analytic.analyst }}</h5></div>
+        <div><h5 class="modal-title">Resource</h5></div>
+      </div> <!--div modal-header ends-->
+
+      <div class="modal-body">
+          <p>{{ analytic.resource }}</p>
+    </div> <!--div modal-content ends -->
+
+    <br>
+
+    <div class="footer text-center">
+        <a class="btn btn-secondary btn-sm mb-3" href="{{ url_for('analytics_page') }}">Close</a>
+    </div>
+
+  </div> <!--div modal-dialog ends-->
+</div> <!--div modal fade ends-->

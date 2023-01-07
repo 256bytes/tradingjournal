@@ -1,0 +1,122 @@
+
+<!-- Sell Modal -->
+ <div class="modal fade" id="Modal-Sell-{{ holding.script }}"
+            tabindex="-1" aria-labelledby="Modal-Sell" aria-hidden="true"> <!--div modal fade starts-->
+   <div class="modal-dialog"> <!--div modal-dialog starts-->
+     <div class="modal-content"> <!--div modal-content starts-->
+       <div class="modal-header"> <!--div modal-header starts-->
+         <div><h5 class="modal-title">Script: {{ holding.script }}</h5></div>
+         <div><h5 class="modal-title">LTP: {{ value | round | float |numberFormat}}</h5></div>
+         <div><h5 class="modal-title">Sell Shares</h5></div>
+       </div> <!--div modal-header ends-->
+       <div class="modal-body">
+         <form action="/sell" method="POST"> <!--form starts-->
+           {{ sell_form.hidden_tag() }}
+            <div>
+              {% for sd in stock_data %}
+                {% if sd.script == holding.script and sd.total_qty > 0 %}
+                  <div>
+                    <p>Account Number: {{ sd.trading_code }}</p>
+                    <input type="hidden" class="form-control" name="script" value="{{ sd.script }}">
+                    <input type="hidden" class="form-control" name="shares_held" value="{{ sd.total_qty }}">
+                    <p>Shares held:    {{ sd.total_qty }}</p>
+                  </div>
+                  <hr>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <hr>
+
+            <div class="mb-3">
+              <label class="col-form-label">Select an Account to sell</label>
+              <select name="code" class="form-control">
+                  {% for t in stock_data %}
+                  {% if t.script == holding.script and t.total_qty > 0 %}
+                      <option>{{ t.trading_code }}</option>
+                  {% endif %}
+                  {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="col-form-label">Quantity</label>
+              <input type="text" class="form-control" name="shares_to_sell" placeholder="Enter number of shares to sell" required="True">
+            </div>
+            <div class="mb-3">
+              <label class="col-form-label">Price</label>
+              <input type="text" class="form-control" name="new_sell_price" placeholder="Enter price of the share" required="True">
+            </div>
+            <hr>
+            <div class="modal-footer">
+              <input type="hidden" class="form-control" name="sell_from">
+              <button type="submit" class="btn btn-outline-danger btn-sm">Sell</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+
+         </form> <!--form ends-->
+       </div> <!--div modal-body ends-->
+     </div> <!--div modal-content ends-->
+   </div> <!--div modal-dialog ends-->
+ </div> <!--div modal fade ends-->
+
+
+
+<!-- Buy Modal -->
+<div class="modal fade" id="Modal-Buy-{{ holding.script }}"
+                    tabindex="-1" aria-labelledby="Modal-Buy" aria-hidden="true"> <!--div modal fade starts-->
+  <div class="modal-dialog"> <!--div modal-dialog starts-->
+    <div class="modal-content"> <!--div modal-content starts-->
+      <div class="modal-header"> <!--div modal-header starts-->
+        <div><h5 class="modal-title">Script: {{ holding.script }}</h5></div>
+        <div><h5 class="modal-title">Buy Shares</h5></div>
+      </div> <!--div modal-header ends-->
+      <div class="modal-body"> <!--div modal-body starts-->
+
+        <form action="/buy" method="POST"> <!--form starts-->
+          {{ add_form.hidden_tag() }}
+
+          <div class="mb-3">
+            <input type="hidden" class="form-control" name="symbol" value="{{ holding.script }}">
+          </div>
+
+          <div class="mb-3">
+            <label class="col-form-label">Quantity</label>
+            <input type="hidden" class="form-control" name="shares_held" value="{{ holding.shares }}">
+            <input type="text" class="form-control" name="quantity" value="{{ holding.shares }}">
+          </div>
+
+          <div class="mb-3">
+            <label class="col-form-label">LTP</label>
+            {% if (holding.shares | int) > 0 %}
+              {% set avg =  (holding.total_investments | int) / (holding.shares | int) %}
+            {% else %}
+            {% set avg =  0 %}
+            {% endif %}
+            <input type="hidden" class="form-control" name="old_price" value="{{ value }}">
+            <input type="text" class="form-control" name="price" value="{{ value }}">
+          </div>
+
+          <div class="form-group">
+            <label class="col-form-label">Select an Account to add</label>
+            <select name="code" class="form-control">
+                {% for t in t_code %}
+                    <option>{{ t.trading_code }}</option>
+                {% endfor %}
+            </select>
+          </div>
+          
+          <div class="modal-footer">
+            <input type="hidden" class="form-control" name="shares_to_add" value="{{ holding.shares }}">
+            {{ add_form.submit(class="btn btn-outline-danger btn-sm") }}
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+          </div>
+
+        </form> <!--form ends-->
+
+      </div> <!--div modal-body ends-->
+    </div> <!--div modal-content ends -->
+  </div> <!--div modal-dialog ends-->
+</div> <!--div modal fade ends-->
+
+
+  

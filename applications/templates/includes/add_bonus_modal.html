@@ -1,0 +1,61 @@
+
+<!-- Add Bonus Modal -->
+<div class="modal fade" id="Modal-Add-{{ holding.script }}" tabindex="-1" aria-labelledby="Modal-Add" aria-hidden="true"> <!--div modal fade starts-->
+  <div class="modal-dialog"> <!--div modal-dialog starts-->
+    <div class="modal-content"> <!--div modal-content starts -->
+      <div class="modal-header"> <!--div modal-header start-->
+        <div><h5 class="modal-title">Script: {{ holding.script }}</h5></div>
+        <div><h5 class="modal-title">Add Bonus Shares</h5></div>
+      </div> <!--div modal-header ends-->
+      <div class="modal-body"> <!--div modal-body starts-->
+        
+        <form action="/add_bonus" method="POST"> <!--form starts-->
+          {{ add_bonus.hidden_tag() }}
+
+            <div>
+              {% for sd in stock_data %}
+                {% if sd.script == holding.script and sd.total_qty > 0 %}
+                  <div>
+                    <p>Account Number: {{ sd.trading_code }}</p>
+                    <input type="hidden" class="form-control" name="script" value="{{ sd.script }}">
+                    <input type="hidden" class="form-control" name="tc" value="{{ sd.trading_code }}">
+                    <input type="hidden" class="form-control" name="shares_held" value="{{ sd.total_qty }}">
+                    <p>Shares held:{{ sd.total_qty }}</p>
+                  </div>
+                  <hr>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+          <hr>
+
+            <div class="mb-3">
+              <label class="col-form-label">Select an Account to Add Bonus</label>
+              <select name="code" class="form-control">
+                  {% for t in stock_data %}
+                  {% if t.script == holding.script and t.total_qty > 0 %}
+                      <option>{{ t.trading_code }}</option>
+                  {% endif %}
+                  {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="col-form-label">Quantity</label>
+              <input type="text" class="form-control" name="add_bonus" placeholder="Enter number of shares to Add" required="True">
+            </div>
+
+          <hr>
+
+            <div class="modal-footer">
+              <input type="hidden" class="form-control" name="add_bonus">
+              <button type="submit" class="btn btn-outline-secondary btn-sm">Add Bonus</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+
+        </form> <!--form ends-->
+        
+      </div> <!--div modal-body ends-->
+    </div> <!--div modal-content ends -->
+  </div> <!--div modal-dialog ends-->
+</div> <!--div modal fade ends-->

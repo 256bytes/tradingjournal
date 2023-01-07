@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+{% block title %}Buy Page{% endblock title %}
+
+
+{% block content %}
+<div class="row mt-3 text-center"> <!--div row starts-->
+        <div class="col-4"><!--div first column starts--></div><!--div first column ends-->
+
+        <div class="col-4 form_bg"> <!--div second column starts-->
+            <div class="modal-header">  <!--div modal-header starts-->
+                <a type="button" class="btn-close" href="{{ url_for('holdings_page') }}" aria-label="Close"></a>
+            </div>  <!--div modal-header ends-->
+
+            <form method="POST" class="form-register mt-2 mb-2">  <!--form starts-->
+                {{ buy_form.hidden_tag() }}
+
+                {{ buy_form.symbol.label() }}
+                {{ buy_form.symbol(class="form-control", autocomplete="off", placeholder="Symbol") }}
+
+                {{ buy_form.price.label() }}
+                {{ buy_form.price(class="form-control", autocomplete="off", placeholder="Price") }}
+
+                {{ buy_form.quantity.label() }}
+                {{ buy_form.quantity(class="form-control", autocomplete="off", placeholder="Quantity") }}
+
+                {{ buy_form.code.label() }}
+
+                <div class="form-group">
+                    <select name="code" class="form-control">
+                        {% for t in t_code %}
+                            <option>{{ t.trading_code }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <br>
+                {{ buy_form.submit(class="btn btn-sm btn-primary") }}
+
+            </form> <!--form ends-->
+
+        </div><!--div second column ends-->
+        
+        <div class="col-4"><!--div third column starts--></div><!--div third column ends-->
+</div> <!--div row ends-->
+{% endblock content %}
