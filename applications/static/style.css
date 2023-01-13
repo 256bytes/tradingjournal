@@ -65,6 +65,8 @@ nav, .form_bg, .modal-content {
     box-shadow: 0 2px 4px rgba(255, 102, 0, 0.3);
     
 }
+
+
 /*
 .table {
     counter-reset: serial-number;  Set the serial number counter to 0
@@ -86,7 +88,7 @@ nav, .form_bg, .modal-content {
     color: red;
 }
 
-.green {
+.green{
     color: #66ff00;
 }
 
@@ -104,19 +106,24 @@ nav, .form_bg, .modal-content {
   }
 
 #btn-current{
-    background-color: orange;
+    background-color: rgb(255, 102, 0);
 }
 
-.navbar-nav li a.active {
-    color:            rgb(255, 102, 0);
+.card{
+    background-color: #222222;
+    color: white;
+    border: solid rgb(63, 63, 63);
+    padding: 5px;
+    margin: 5px;
 }
 
-#navbarSupportedContent ul li a.active {
-    color: rgb(255, 102, 0);
+h5 .card-currency{
+    color: #66ff00;
 }
 
-#navbarDropdown .active {
-    color: rgb(255, 102, 0);
+div .dashboard_cards{
+    float: left;
+    padding: 10px 10px;
 }
 /* 2c2c2c - Bg
 

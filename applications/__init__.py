@@ -3,12 +3,12 @@ import secrets
 from flask import Flask
 
 
-
 secret = secrets.token_urlsafe(32)
 
 # My db connection
 local_server = True
 app = Flask(__name__)
+
 app.secret_key = secret
 
 
@@ -27,10 +27,11 @@ def numberFormat(value):
 
 
 
-from applications.routers import import_holdings_route, login_route, register_route, add_broker_route, settings_route, home_route, buy_route, notes_route,\
+from applications.routers import add_funds_route, import_holdings_route, login_route, register_route, add_broker_route, settings_route, home_route, buy_route, notes_route,\
             holdings_route, profit_loss_route, analytic_route, logout_route
-from applications.routers import analysis_import_route, sell_route, delete_analysis, add_bonus_route, sell_history_route, buy_history_route, delete_broker
+from applications.routers import analysis_import_route, sell_route, delete_analysis, add_bonus_route, sell_history_route, buy_history_route, delete_broker,\
+    fund_history_route, withdraw_funds_route
 
 
-# from applications import routes
+
 

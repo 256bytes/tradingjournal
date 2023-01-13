@@ -1,0 +1,33 @@
+
+<!-- Add Funds Modal -->
+<div class="modal fade" id="addFunds-{{ item.id }}"
+tabindex="-1" aria-labelledby="addFunds" aria-hidden="true"> <!--div modal fade starts-->
+<div class="modal-dialog"> <!--div modal-dialog starts-->
+<div class="modal-content"> <!--div modal-content starts-->
+<div class="modal-header"> <!--div modal-header starts-->
+</div> <!--div modal-header ends-->
+<div class="modal-body">
+<form action="/add_funds" method="POST"> <!--form starts-->
+{{ add_funds_form.hidden_tag() }}
+<hr>
+
+<div class="mb-3">
+    <label class="col-form-label">{{ item.name }}</label>
+</div>
+<div class="mb-3">
+    <label class="col-form-label">Tradnig Code: {{ item.trading_code }}</label>
+</div>
+
+<input type="hidden" class="form-control" name="trader_name" value="{{ item.name}}" required="True">
+<input type="hidden" class="form-control" name="trader_code" value="{{ item.trading_code}}" required="True">
+<div class="mb-3">
+    {{ add_funds_form.add_funds(class="form-control", autocomplete="off", placeholder="Enter the Amount to add") }}
+</div>
+{{ add_funds_form.submit(class="btn btn-primary btn-sm")}}
+
+
+</form> <!--form ends-->
+</div> <!--div modal-body ends-->
+</div> <!--div modal-content ends-->
+</div> <!--div modal-dialog ends-->
+</div> <!--div modal fade ends-->

@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+{% block title %}Fund History{% endblock title %}
+
+{% block content %}
+<div class="row"> <!--div first row starts -->
+    <div class="4"> <!--div first column starts --></div> <!--div first column ends -->
+        <div class="4"> <!--div second column starts -->
+            <table class="table table-dark table-striped table-sm tableFixHead">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">date</th>
+                        <th scope="col">Trading Account</th>
+                        <th scope="col">Pay In</th>
+                        <th scope="col">Pay Out</th>
+                        <th scope="col">Debits</th>
+                        <th scope="col">Credits</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        {% for fd in fund_data.items %}
+                        <tr>
+                            <td></td>
+                            <td>{{ fd.date }}</td>
+                            <td>{{ fd.trading_code }}</td>
+                            <td>{{ fd.pay_in }}</td>
+                            <td>{{ fd.pay_out }}</td>
+                            <td>{{ fd.debits }}</td>
+                            <td>{{ fd.credits }}</td>
+                        </tr>
+                        {% endfor %}
+                </tbody>
+            </table>
+            <div class="text-center paginated">
+                {% for page_num in fund_data.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if page_num %}
+                        {% if fund_data.page == page_num %}
+                            <a class="btn mb-4" id="btn-current" href="{{ url_for('fund_history_page', page=page_num) }}">{{ page_num }}</a>
+                        {% else %}
+                            <a class="btn btn-outline-info mb-4" href="{{ url_for('fund_history_page', page=page_num) }}">{{ page_num }}</a>
+                        {% endif %}
+                    {% else %}
+                        ...
+                    {% endif %}
+                {% endfor %}
+            </div> <!--div paginated ends -->
+        </div> <!--div second column ends -->
+    <div class="4"> <!--div third column starts --></div> <!--div third column ends -->
+</div><!--div first row ends -->
+{% endblock content %}

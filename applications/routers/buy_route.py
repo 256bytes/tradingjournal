@@ -4,9 +4,9 @@ from flask_login import current_user, login_required
 #-------------User Packages --------------------#
 from applications import app
 from applications.forms import BuyForm
-from applications.models import Brokers, Users, Transactions
+from applications.models import Brokers, Users, Transactions, Funds
 from applications.database import db
-from applications.helpers import lookup
+from applications.helpers import lookup, chk_special
 from applications.calc_taxes.get_taxes import CaluculateBrokerageAndTaxes
 
 
@@ -14,8 +14,10 @@ from applications.calc_taxes.get_taxes import CaluculateBrokerageAndTaxes
 @app.route('/buy', methods=['GET', 'POST'])
 @login_required
 def buy_page():
+
     call = "buy"
     buy_form = BuyForm()
+    
     # to populate the users trading codes in buy form.
     db.session.rollback()
     db.session.begin()
@@ -32,6 +34,8 @@ def buy_page():
             flash("Enter a Valid Symbol", category='danger')
             return render_template('/home.html', buy_form=buy_form, t_code=t_code)
 
+        symb = chk_special(symbol)
+        
         #--------------------------- Checking input of price field ---------------------------------------
         try:
             price = float(request.form.get('price'))
@@ -77,13 +81,27 @@ def buy_page():
         except Exception as e:
                 flash(f"Something went wrong while getting the result. error: {e}", category='warning')
                 return redirect(url_for('holdings_page'))
+
+        #-------------------------- Updating Funds table ---------------------------------------------------
+        try:
+            db.session.rollback()
+            db.session.begin()
+            update_funds = Funds(user_id = current_user.id,
+                                trading_code = code,
+                                debits = result.r_payable)
+            db.session.add(update_funds)
+            db.session.commit()
+        except Exception as e:
+            flash(f"Something went wrong while inserting the data to the funds table. error: {e}", category='warning')
+            return redirect(url_for('buy_page'))
+
         try:
             db.session.rollback()
             db.session.begin()
             script_to_add = Transactions(user_id = current_user.id,
                             type = "CNC",
                             call = 'Buy',
-                            script = symbol,
+                            script = symb,
                             price = buy_form.price.data,
                             qty = buy_form.quantity.data,
                             brokerage_per_unit = result.r_b,
@@ -105,7 +123,7 @@ def buy_page():
             flash("Script successfully added!", category='success')
             return redirect(url_for('buy_page'))
         except Exception as e:
-            flash(f"Something went wrong while inserting the data to the database. error: {e}", category='warning')
+            flash(f"Something went wrong while inserting the data to the transaction table. error: {e}", category='warning')
             return redirect(url_for('buy_page'))
     else:
         return render_template('/buy.html', buy_form=buy_form, t_code=t_code)

@@ -95,3 +95,15 @@ class StoplossTargetRadio(FlaskForm):
                                 ("Target", "Target")
                                 ], default="None")
     submit = SubmitField(label='Save')
+
+class AddFunds(FlaskForm):
+    name = StringField(label='Name of the Broker', validators=[DataRequired()])
+    trading_code = StringField(label='Trading Code', validators=[DataRequired()])
+    add_funds = FloatField(label='Add Funds:', validators=[DataRequired()])
+    submit = SubmitField(label="Add Funds")
+
+class WithdrawFunds(FlaskForm):
+    name = StringField(label='Name of the Broker', validators=[DataRequired()])
+    trading_code = StringField(label='Trading Code', validators=[DataRequired()])
+    withdraw_funds = FloatField(label='Withdraw Funds:', validators=[DataRequired()])
+    submit = SubmitField(label="Pay out")

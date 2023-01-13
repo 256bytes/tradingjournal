@@ -4,7 +4,7 @@ from sqlalchemy import func
 
 #-------------User Packages --------------------#
 from applications import app
-from applications.models import Brokers, Transactions
+from applications.models import Brokers, Transactions, Funds
 from applications.database import db
 from applications.calc_taxes.get_taxes import CaluculateBrokerageAndTaxes
 
@@ -53,6 +53,19 @@ def sell_page():
                 result = CaluculateBrokerageAndTaxes(t_code, current_user.id, float(sell_price), int(sell_qty), call)
             except Exception as e:
                 flash(f"Something went wrong while getting the result. error: {e}", category='warning')
+                return redirect(url_for('sell_page'))
+
+            #-------------------------- Updating Funds table ---------------------------------------------------
+            try:
+                db.session.rollback()
+                db.session.begin()
+                update_funds = Funds(user_id = current_user.id,
+                                    trading_code = t_code,
+                                    credits = result.r_payable)
+                db.session.add(update_funds)
+                db.session.commit()
+            except Exception as e:
+                flash(f"Something went wrong while inserting the data to the funds table. error: {e}", category='warning')
                 return redirect(url_for('sell_page'))
 
             try:

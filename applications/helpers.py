@@ -1,7 +1,7 @@
 from flask import flash
 from sqlalchemy import func
 from nsepython import *
-import requests
+import re
 import yfinance as yf
 
 
@@ -52,6 +52,24 @@ def my_ltp(symbol):
     except Exception as e:
         flash("Couldn't find the last trading price.", category='info')
         return False
+
+
+# Function checks if the string
+# contains any ampersand character
+def chk_special(string):
+
+    for esc in string:
+        # if found it would replace it
+        if esc == '&':
+            result = string.replace('&', '_')
+            return result
+        
+    return string
+     
+        
+
+
+
     # url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=NSE:{symbol}&apikey=4AA22TX42RKVS30F'
     # r = requests.get(url)
     # data = r.json()

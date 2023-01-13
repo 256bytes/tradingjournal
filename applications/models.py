@@ -2,6 +2,7 @@ from applications.database import db, bcrypt
 from applications.database import login_manager
 from flask_login import UserMixin
 from sqlalchemy.orm import validates
+from sqlalchemy import text
 import datetime
 
 
@@ -15,13 +16,15 @@ class Users(db.Model, UserMixin):
     __tablename__ = "users"
 
     id = db.Column(db.Integer(), primary_key=True)
-    date = db.Column(db.DateTime(), default=datetime.datetime.now())
+    date = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     username = db.Column(db.String(45), unique=True, nullable=False)
     email = db.Column(db.String(45), unique=True, nullable=False)
     hash_password = db.Column(db.String(60), nullable=False)
+    last_logged = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now(), nullable=False)
     scripts = db.relationship('Transactions', backref='owner_id', lazy=True)
     brokers = db.relationship('Brokers', backref="user_brokers", lazy=True)
     research = db.relationship('Research', backref="user_research", lazy=True)
+    funds = db.relationship('Funds', backref="user_funds", lazy=True)
 
     @property
     def password(self):
@@ -73,7 +76,7 @@ class Transactions(db.Model):
 
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
-    date = db.Column(db.DateTime(), nullable=False, default=datetime.datetime.now())
+    date = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     type = db.Column(db.String(length=10), nullable=False)
     call = db.Column(db.String(length=10), nullable=False)
     script = db.Column(db.String(length=45))
@@ -93,20 +96,19 @@ class Transactions(db.Model):
     broker = db.Column(db.String(length=45))
     trading_code = db.Column(db.String(length=45), nullable=False)
 
-# class Holdings(db.Model):
+class Funds(db.Model):
 
-#     __tablename__ = "holdings"
+    __tablename__ = "funds"
 
-#     id = db.Column(db.Integer(), primary_key=True)
-#     date = db.Column(db.DateTime())
-#     t_code = db.Column(db.String(length=10), nullable=False)
-#     script = db.Column(db.String(length=10), nullable=False)
-#     avg_cost = db.Column(db.Float(), nullable=False)
-#     qty = db.Column(db.Integer(), nullable=False)
-#     invested_amt = db.Column(db.Float(), nullable=False)
-#     ltp = db.Column(db.Float(), nullable=False)
-#     curr_value = db.Column(db.Float(), nullable=False)
-#     profit_loss = db.Column(db.Integer(), nullable=False)
+    id = db.Column(db.Integer(), primary_key=True)
+    date = db.Column(db.TIMESTAMP(timezone=True), server_default=text('now()'), nullable=False)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    trading_code = db.Column(db.String(length=45), nullable=False)
+    pay_in = db.Column(db.Integer(), default=0.00, nullable=False)
+    debits = db.Column(db.Float(), default=0.00, nullable=False)
+    credits = db.Column(db.Float(), default=0.00, nullable=False)
+    pay_out = db.Column(db.Integer(), default=0.00, nullable=False)
+    balance = db.Column(db.Float(), default=0.00, nullable=False)
 
 class Research(db.Model):
 
@@ -114,7 +116,7 @@ class Research(db.Model):
 
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
-    date = db.Column(db.DateTime(), nullable=False, default=datetime.datetime.now())
+    date = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     script = db.Column(db.String(length=50))
     price = db.Column(db.Float())
     call = db.Column(db.String(length=10))
@@ -148,11 +150,11 @@ class Analysts(db.Model):
     performance = db.Column(db.Float(), nullable=False, default=0)
 
 
-class Test(db.Model):
+# class Test(db.Model):
     
-    id = db.Column(db.Integer(), primary_key=True)
-    account = db.Column(db.String(length=10))
-    script = db.Column(db.String(length=10))
-    total_qty = db.Column(db.String(length=10))
+#     id = db.Column(db.Integer(), primary_key=True)
+#     account = db.Column(db.String(length=10))
+#     script = db.Column(db.String(length=10))
+#     total_qty = db.Column(db.String(length=10))
     
 

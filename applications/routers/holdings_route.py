@@ -7,12 +7,12 @@ from applications import app
 from applications.forms import SellForm, AddForm, AddBonusForm
 from applications.models import Brokers, Transactions
 from applications.database import db
-from applications.helpers import multiple_group, my_ltp
+from applications.helpers import multiple_group, my_ltp, chk_special
 
 
 @app.route('/holdings', methods=['GET', 'POST'])
 @login_required
-def holdings_page(): #--------------------------------------------------------------------------------------------------------------------Holdings
+def holdings_page(): 
     sell_form = SellForm()
     add_form = AddForm()
     add_bonus = AddBonusForm()
@@ -29,7 +29,7 @@ def holdings_page(): #----------------------------------------------------------
         results = my_ltp(symbol)
         # results = ltp(symbol)
         dict[symbol] = results
-        
+    
     page = request.args.get('page', 1, int)
     holdings = db.session.query(Transactions.script, func.sum(Transactions.qty).label('shares'), func.sum(Transactions.net_total).label('total_investments')).\
                             filter(Transactions.user_id == current_user.id, Transactions.type == 'CNC').\

@@ -4,7 +4,7 @@ from sqlalchemy import update
 
 #-------------User Packages --------------------#
 from applications import app
-from applications.forms import UpdateForm
+from applications.forms import UpdateForm, AddFunds
 from applications.models import Brokers, Users, Taxes
 from applications.database import db
 
@@ -15,6 +15,8 @@ def settings_page():
     users = Users.query.filter_by(id=current_user.id)
     taxes = Taxes.query.all()
     broker_query = Brokers.query.filter_by(user_id=current_user.id)
+    broker_data = Brokers.query.filter(Brokers.user_id == current_user.id).all()
+    add_funds_form = AddFunds()
     update_form = UpdateForm()
     brokers_id = request.form.get('brokers_id')
 
@@ -75,4 +77,4 @@ def settings_page():
                 return render_template('home.html')
 
         
-    return render_template('/settings.html', broker_query=broker_query, update_form=update_form, users=users, taxes=taxes)
+    return render_template('/settings.html', broker_query=broker_query, update_form=update_form, users=users, taxes=taxes, broker_data=broker_data, add_funds_form=add_funds_form)
