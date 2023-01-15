@@ -6,7 +6,7 @@ import os
 #-------------User Packages --------------------#
 from applications import app
 from applications.models import Brokers, Transactions
-from applications.helpers import lookup
+from applications.helpers import lookup, chk_special
 from applications.database import db
 from applications.calc_taxes.get_taxes import CaluculateBrokerageAndTaxes
 
@@ -76,13 +76,15 @@ def import_data_form():
                 os.remove(f.filename)
                 return redirect(url_for('holdings_page'))
 
+            symb = chk_special(script)
+
             try:
                 db.session.rollback()
                 db.session.begin()
                 script_to_add = Transactions(user_id = current_user.id,
-                                type = type,
+                                type = "CNC",
                                 call = 'Buy',
-                                script = script,
+                                script = symb,
                                 price = price,
                                 qty = qty,
                                 brokerage_per_unit = result.r_b,

@@ -1,9 +1,14 @@
-from applications.database import db, bcrypt
-from applications.database import login_manager
+from flask import flash
 from flask_login import UserMixin
 from sqlalchemy.orm import validates
 from sqlalchemy import text
+from alembic import op
 import datetime
+
+
+from applications.database import db, bcrypt
+from applications.database import login_manager
+
 
 
 @login_manager.user_loader
@@ -101,7 +106,7 @@ class Funds(db.Model):
     __tablename__ = "funds"
 
     id = db.Column(db.Integer(), primary_key=True)
-    date = db.Column(db.TIMESTAMP(timezone=True), server_default=text('now()'), nullable=False)
+    date = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     trading_code = db.Column(db.String(length=45), nullable=False)
     pay_in = db.Column(db.Integer(), default=0.00, nullable=False)
@@ -122,7 +127,7 @@ class Research(db.Model):
     call = db.Column(db.String(length=10))
     stop_loss = db.Column(db.Float())
     target = db.Column(db.Float())
-    time_frame = db.Column(db.Numeric())
+    time_frame = db.Column(db.Integer())
     analyst = db.Column(db.String(length=50))
     performance = db.Column(db.Float())
     resource = db.Column(db.Text())

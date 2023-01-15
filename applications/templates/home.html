@@ -3,92 +3,72 @@
 
 {% block content %}
 <div class="row">
-  <div class="container dashboard_cards">
-    {% if investments %}
+  <div class="text-center">
+    <div>
+      <img class='mb-3' src="{{ url_for('static', filename='images/new_version_logo.png') }}" width=200 alt="Website Logo">
+    </div>
+    <hr>
+  </div>
+</div>
+  <div class="row">
+    <div class="container d-flex dashboard_cards">
       {% for item in brokers %}
       {% set outer_loop = loop %}
         {% for inv in investments %}
+        {% if outer_loop.index0 == loop.index0 %}
         {% set inner_loop = loop %}
           {% for fnds in funds %}
+          {% if inner_loop.index0 == loop.index0 %}
           {% include 'includes/add_funds_modal.html' %}
           {% include 'includes/withdraw_funds_modal.html' %}
-            {% if outer_loop.index0 == loop.index0 %}
-              {% if inner_loop.index0 == loop.index0 %}
-  
-                            <div class="card col-3 d-flex dashboard_cards">
-                              <div class="card-body dashboard_cards">
-                                      <div>
-                                      <h4 class="card-title">{{ item.name }}</h4>
-                                      <hr>
-                                      <h5 class="card-text">Trading Code: {{ item.trading_code }}</h5>
-                                      <div class="d-flex">
-                                        {% if inv.total != None %}
-                                          {% if inv.total < 0 %}
-                                          {% set invested = 0.00 %}
-                                        <h5 class="card-currency">Invested Amt:&#160; </h5>
-                                        <h5 class="card-currency green" > {{ format_price(invested) }}</h5>
-                                          {% else %}
-                                          <h5 class="card-currency green" > {{ format_price(inv.total) }}</h5>
-                                          {% endif %}
-                                        {% endif %}
-                                      </div>
-                                      <hr>
-                                      <div class="d-flex">
-                                        <h5 class="card-currency">Funds:&#160; </h5>
-                                        <h5 class="card-currency green" >{{ format_price(fnds) }}</h5>
-                                      </div>
-                                      <hr>
-                                      <div class="d-flex">
-                                        <h5 class="card-text me-3" ><button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addFunds-{{ item.id }}">
-                                          Add Funds
-                                      </button></h5>
-                                      <h5 class="card-text me-3" ><button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#withdrawFunds-{{ item.id }}">
-                                        Withdraw Funds
-                                    </button></h5>
-                                      </div>
-                                  </div>
-                              </div>
-                            </div>
-              {% endif %}
-              {% endif %}
-            {% endfor %}    
+        <div class="card " style="width: 18rem;">
+          <div class="card-header">
+            <div>{{ item.name }}</div> 
+            <div>Trading Code: &#160; {{ item.trading_code }}</div> 
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <div class="d-flex">
+                {% if inv.total == None %}
+                {% set invested = 0.00 %}
+                  <h6 class="card-text card-currency">Invested Amt:&#160; </h6>
+                  <h6 class="card-currency green" > {{ format_price(invested) }}</h6>
+                {% elif inv.total < 0 %}
+                {% set invested = 0.00 %}
+                  <h6 class="card-text card-currency">Invested Amt:&#160; </h6>
+                  <h6 class="card-currency green" > {{ format_price(invested) }}</h6>
+                {% else %}
+                  <h6 class="card-currency">Invested Amt:&#160; </h6>
+                  <h6 class="card-currency green" > {{ format_price(inv.total) }}</h6>
+                {% endif %}
+              </div>
+            </li>
+            
+
+            <li class="list-group-item"><div class="d-flex">
+                <h6 class="card-currency">Funds:&#160; </h6>
+                <h6 class="card-currency green" >{{ format_price(fnds) }}</h6>
+            </div></li>
+          </ul>
+          <div class="card-footer">
+            <div class="d-flex">
+              <h6 class="card-text me-3" ><button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addFunds-{{ item.id }}">
+                Add Funds
+            </button></h6>
+            <h6 class="card-text me-3" ><button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#withdrawFunds-{{ item.id }}">
+              Withdraw Funds
+          </button></h6>
+            </div>
+          </div>
+        </div>
+          {% endif %}
+          {% endfor %}
+        {% endif %}
         {% endfor %}
       {% endfor %}
     </div>
-    {% else %}
-      <div class="container dashboard_cards">
-        <div class="text-center dashboard_cards">
-          <img class='mb-3' src="{{ url_for('static', filename='images/new_version_logo.png') }}" width=200 alt="Website Logo">
-        </div>
-        <hr>
-        <div>
-          {% for item in brokers %}
-          {% include 'includes/add_funds_modal.html' %}
-          <div class="card" style="width: 18rem;">
-            <div class="card-header">
-              <div>{{ item.name }}</div>
-              <div>Trading Code: &#160; {{ item.trading_code }}</div> 
-            </div>
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item">Invested Amt:&#160; 0.00</li>
-              <li class="list-group-item">Funds:&#160; 0.00</li>
-            </ul>
-            <div class="card-footer">
-              <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addFunds-{{ item.id }}">
-                Add Funds
-              </button>
-  
-              <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#withdrawFunds-{{ item.id }}">
-                Withdraw Funds
-              </button>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-    {% endif %}
-  
 </div>
+      
 {% endblock content %}
 
 {%- macro format_price(price, thousand_separator=',', decimal_separator='.', decimal_places=2) -%}

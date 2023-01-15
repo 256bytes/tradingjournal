@@ -22,7 +22,11 @@
             <tr>
                 <td>{{ sb.date.strftime('%d/%m/%y')}}</td>
                 <td>{{ sb.trading_code }}</td>
-                <td>{{ sb.script }}</td>
+                {% if '_' in sb.script %}
+                    <td>{{ sb.script | replace('_', '&') }}</td>
+                {% else %}
+                    <td>{{ sb.script }}</td>
+                {% endif %}
                 <td>{{ sb.qty }}</td>
                 <td>{{ format_price(sb.price )}}</td>
                 <td>{{ format_price(sb.brokerage_per_unit) }}</td>

@@ -54,7 +54,11 @@ class CaluculateBrokerageAndTaxes():
             else:
                 self.r_tb = 20
             
-            self.r_rpu = (self.__price + self.r_b)
+            if self.__call == "sell":
+                self.r_rpu = (self.__price - self.r_b)
+            else:
+                self.r_rpu = (self.__price + self.r_b)
+                
             self.r_turn_over = (self.r_rpu * self.__qty)
             self.r_net_before_tax = ((self.r_rpu + self.r_b) * (self.__qty))
 

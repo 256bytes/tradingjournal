@@ -1,12 +1,10 @@
 from flask import flash
 from sqlalchemy import func
 from nsepython import *
-import re
-import yfinance as yf
-
 
 from applications.models import Transactions
-from applications.database import db
+from applications.database import db, app
+
 
 
 def multiple_group(user_id, groupby):
@@ -23,6 +21,10 @@ def multiple_group(user_id, groupby):
 	
 	return stock_data
 
+
+
+
+#----------------Stock Search---------------#
 def lookup(symbol):
     if symbol == None:
         return False
@@ -32,26 +34,6 @@ def lookup(symbol):
             return False
         else:
             return True
-
-# def ltp(symbol):
-#     if symbol == None:
-#         return False
-
-#     try:
-#         return(nse_quote_ltp(symbol=symbol))
-
-#     except Exception as e:
-#         print(e)
-#         return False
-
-def my_ltp(symbol):
-    tick = symbol + ".NS"
-    try:
-        ltp = yf.download(tick)["Close"].iloc[-1]
-        return ltp
-    except Exception as e:
-        flash("Couldn't find the last trading price.", category='info')
-        return False
 
 
 # Function checks if the string
@@ -63,29 +45,35 @@ def chk_special(string):
         if esc == '&':
             result = string.replace('&', '_')
             return result
+        elif esc == "_":
+            result = string.replace('_', '&')
+            return result
         
     return string
      
-        
+
+def my_ltp(symbol):
+    
+    if symbol == None:
+        return False
+    symb = chk_special(symbol)     
+    try:
+        return nse_eq(symb)['priceInfo']['lastPrice']
+
+    except Exception as e:
+        flash(f"Something went wrong in my_ltp(). error: {e}", category='danger')
+        return False
+app.jinja_env.globals.update(my_ltp=my_ltp)
 
 
+#--------- Yahoo finance -----------------------#
 
-    # url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=NSE:{symbol}&apikey=4AA22TX42RKVS30F'
-    # r = requests.get(url)
-    # data = r.json()
-    # print('\n')
-    # print(f"this is from outside the for: {data}")
-    # print('\n')
-    # for i in data:
-    #     print('\n')
-    #     print(f"this is from for: {i}")
-    #     print('\n')
-# def nse_custom_function_secfno(symbol,attribute="lastPrice"):
-#     positions = nsefetch('https://www.nseindia.com/api/equity-stockIndices?index=SECURITIES%20IN%20F%26O')
-#     endp = len(positions['data'])
-#     for x in range(0, endp):
-#         if(positions['data'][x]['symbol']==symbol.upper()):
-#             return positions['data'][x][attribute]
-
-# print(nse_custom_function_secfno("Reliance"))
-# print(nse_custom_function_secfno("Reliance","pChange"))
+# def my_ltp(symbol):
+#     symb = chk_special(symbol)
+#     tick = symb + ".NS"
+#     try:
+#         ltp = yf.download(tick)["Close"].iloc[-1]
+#         return ltp
+#     except Exception as e:
+#         flash("Couldn't find the last trading price.", category='info')
+#         return False

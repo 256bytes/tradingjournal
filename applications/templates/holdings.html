@@ -42,44 +42,52 @@
     <tbody>
         {% for holding in holdings.items %}
             {% set outer_loop = loop %}
-            {% for key, value in dict.items() %}
                 {% if outer_loop.index0 == loop.index0 %}
                 {% include 'includes/trade_modal.html' %}
                 {% include 'includes/add_bonus_modal.html' %}
-                    {% if (holding.shares | int) > 0 %}
-                        <tr>
-                            <td></td>
-                            <td>{{ holding.script }}</td>
-                            <td>{{ holding.shares }}</td>
-                            {% set avg =  (holding.total_investments | int) / (holding.shares | int) %}
-                            {% if avg < 0 %}
-                                {% set avg = 0.00 %}
-                            {% endif %}
-                            <td>{{ format_price(avg | round(2) | float) }}</td>
-                            {% set invested = holding.total_investments %}
-                            {% if invested < 0 %}
-                                {% set invested = 0.00 %}
-                            {% endif %}
-                            <td>{{ format_price(invested | round(2) | float)}}</td>
-                            <td>{{ format_price(value | round(2) | float) }}</td>
-                            <td>{{ format_price((value | round(2) | float ) * (holding.shares | round(2) | float)) }}</td>
+                        {% if (holding.shares | int) > 0 %}
+                            <tr>
+                                <td></td>
+                                {% if '_' in holding.script %}
+                                    <td>{{ holding.script | replace('_', '&') }}</td>
+                                {% else %}
+                                    <td>{{ holding.script }}</td>
+                                {% endif %}
 
-                            {% set curr_value = (value | round(2) | float ) * (holding.shares | round(2) | float) %}
-                            {% set investment = (holding.total_investments) %}
-                            {% set result = curr_value - investment %}
+                                <td>{{ holding.shares }}</td>
 
-                            <td class="{{ "green" if (curr_value > investment) == True else "red"}}">{{format_price(result |abs)  }}</td>
-                            <td>
-                                <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#Modal-Buy-{{ holding.script }}">Buy</button>
-                                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#Modal-Sell-{{ holding.script }}">Sell</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#Modal-Add-{{ holding.script }}">Add Bonus</button>
-                            </td>
-                        </tr>
-                    {% else %}
-                        {% set avg = 0 %}
-                    {% endif %}
+                                {% set avg =  (holding.total_investments | int) / (holding.shares | int) %}
+                                {% if avg < 0 %}
+                                    {% set avg = 0.00 %}
+                                {% endif %}
+                                <td>{{ format_price(avg | round(2) | float) }}</td>
+                                {% set invested = holding.total_investments %}
+                                {% if invested < 0 %}
+                                    {% set invested = 0.00 %}
+                                {% endif %}
+
+                                <td>{{ format_price(invested | round(2) | float)}}</td>
+                                
+                                <td>{{ format_price(my_ltp(holding.script)) }}</td>
+
+                                {% set ltp = my_ltp(holding.script) %}
+                                <td>{{ format_price((ltp | round(2) | float ) * (holding.shares | round(2) | float)) }}</td>
+
+                                {% set curr_value = (ltp | round(2) | float ) * (holding.shares | round(2) | float) %}
+                                {% set investment = (holding.total_investments) %}
+                                {% set result = curr_value - investment %}
+                                <td class="{{ "green" if (curr_value > investment) == True else "red"}}">{{format_price(result |abs)  }}</td>
+                                
+                                <td>
+                                    <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#Modal-Buy-{{ holding.script }}">Buy</button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#Modal-Sell-{{ holding.script }}">Sell</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#Modal-Add-{{ holding.script }}">Add Bonus</button>
+                                </td>
+                            </tr>
+                        {% else %}
+                            {% set avg = 0 %}
+                        {% endif %}
                 {% endif %}
-            {% endfor %}
         {% endfor %}
     </tbody>
 </table>
@@ -97,6 +105,8 @@
             {% endif %}
         {% endfor %}
     </div>
+
+
 
 
 
@@ -118,41 +128,49 @@
         <tbody>
             {% for holding in holdings %}
                 {% set outer_loop = loop %}
-                {% for key, value in dict.items() %}
                     {% if outer_loop.index0 == loop.index0 %}
                     {% include 'includes/trade_modal.html' %}
                     {% if (holding.shares | int) > 0 %}
-                            <tr>
-                                <td></td>
-                                <td>{{ holding.script }}</td>
-                                <td>{{ holding.shares }}</td>
-                                {% set avg =  (holding.total_investments | int) / (holding.shares | int) %}
-                                {% if avg < 0 %}
-                                    {% set avg = 0.00 %}
-                                {% endif %}
-                                <td>{{ (avg | round(2) | float) |numberFormat }}</td>
-                                {% set invested = holding.total_investments %}
-                                {% if invested < 0 %}
-                                    {% set invested = 0.00 %}
-                                {% endif %}
-                                <td>{{ (invested | round(2) | float) |numberFormat  }}</td>
-                                <td>{{ value |numberFormat }}</td>
-                                <td>{{ ((value | round(2) | float ) * (holding.shares | round(2) | float)) |numberFormat }}</td>
-    
-                                {% set curr_value = (value | round(2) | float ) * (holding.shares | round(2) | float) %}
-                                {% set investment = (holding.total_investments ) %}
-                                {% set result = curr_value - investment %}
-    
-                                <td class="{{ "green" if (curr_value > investment) == True else "red"}}">{{result |numberFormat }}</td>
-                                {% else %}
-                                    {% set avg = 0 %}
-                        </tr>
+                    <tr>
+                        <td></td>
+                        {% if '_' in holding.script %}
+                            <td>{{ holding.script | replace('_', '&') }}</td>
+                        {% else %}
+                            <td>{{ holding.script }}</td>
                         {% endif %}
-                    {% endif %}
-                {% endfor %}
-            {% endfor %}
-        </tbody>
-      </table>
+
+                        <td>{{ holding.shares }}</td>
+
+                        {% set avg =  (holding.total_investments | int) / (holding.shares | int) %}
+                        {% if avg < 0 %}
+                            {% set avg = 0.00 %}
+                        {% endif %}
+                        <td>{{ format_price(avg | round(2) | float) }}</td>
+                        {% set invested = holding.total_investments %}
+                        {% if invested < 0 %}
+                            {% set invested = 0.00 %}
+                        {% endif %}
+
+                        <td>{{ format_price(invested | round(2) | float)}}</td>
+                        
+                        <td>{{ my_ltp(holding.script) }}</td>
+                        {% set ltp = my_ltp(holding.script) %}
+
+                        <td>{{ format_price((ltp | round(2) | float ) * (holding.shares | round(2) | float)) }}</td>
+
+                        {% set curr_value = (ltp | round(2) | float ) * (holding.shares | round(2) | float) %}
+                        {% set investment = (holding.total_investments) %}
+                        {% set result = curr_value - investment %}
+
+                        <td class="{{ "green" if (curr_value > investment) == True else "red"}}">{{format_price(result |abs)  }}</td>
+                    </tr>
+                {% else %}
+                    {% set avg = 0 %}
+                {% endif %}
+        {% endif %}
+{% endfor %}
+</tbody>
+</table>
   </div>
 {% endblock content %}
 

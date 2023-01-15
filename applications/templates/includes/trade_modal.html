@@ -6,7 +6,7 @@
      <div class="modal-content"> <!--div modal-content starts-->
        <div class="modal-header"> <!--div modal-header starts-->
          <div><h5 class="modal-title">Script: {{ holding.script }}</h5></div>
-         <div><h5 class="modal-title">LTP: {{ value | round | float |numberFormat}}</h5></div>
+         <div><h5 class="modal-title">LTP: {{ format_price(my_ltp(holding.script)) }}</h5></div>
          <div><h5 class="modal-title">Sell Shares</h5></div>
        </div> <!--div modal-header ends-->
        <div class="modal-body">

@@ -23,10 +23,10 @@
                             <td></td>
                             <td>{{ fd.date }}</td>
                             <td>{{ fd.trading_code }}</td>
-                            <td>{{ fd.pay_in }}</td>
-                            <td>{{ fd.pay_out }}</td>
-                            <td>{{ fd.debits }}</td>
-                            <td>{{ fd.credits }}</td>
+                            <td>{{ format_price (fd.pay_in )}}</td>
+                            <td>{{ format_price (fd.pay_out) }}</td>
+                            <td>{{ format_price (fd.debits )}}</td>
+                            <td>{{ format_price (fd.credits) }}</td>
                         </tr>
                         {% endfor %}
                 </tbody>
@@ -48,3 +48,25 @@
     <div class="4"> <!--div third column starts --></div> <!--div third column ends -->
 </div><!--div first row ends -->
 {% endblock content %}
+
+{%- macro format_price(price, thousand_separator=',', decimal_separator='.', decimal_places=2) -%}
+{%- set price_as_string = price | string -%}
+{%- set price_split = price_as_string.split('.') -%}
+{%- set price_integer = price_split[0] -%}
+{%- if price_split | count > 1 -%}
+{%- set price_fraction = price_split[1] -%}
+{%- if price_fraction | length < decimal_places -%}
+{%- set price_fraction = price_fraction.ljust(decimal_places, '0') -%} 
+{%- else -%}
+{%- set price_fraction = price_fraction[:decimal_places] -%}
+{%- endif -%}
+{%- else -%}
+{%- set price_fraction = '' -%}
+{%- endif -%}
+{%- set formatted_price_integer = price_integer | reverse | batch(3) | map('join', '') | join(thousand_separator) | reverse -%}
+{%- if price_fraction != '' -%}
+{%- set formatted_price = formatted_price_integer ~ decimal_separator ~ price_fraction -%}
+{%- else -%}
+{%- set formatted_price = formatted_price_integer-%}
+{%- endif -%}
+{{- formatted_price -}} {%- endmacro -%}

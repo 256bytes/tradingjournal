@@ -1,0 +1,63 @@
+{% extends 'layout.html' %} {% block title %}Bonus History{% endblock title %}
+{% block content %}
+<table class="table table-dark table-striped table-sm tableFixHead">
+  <thead>
+    <div class="history_headings"><h3>Bonus History Table</h3></div>
+    <tr>
+      <th>Date</th>
+      <th>Account</th>
+      <th>Script</th>
+      <th>Qty</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for bonus in bonus_stocks.items %}
+    <tr>
+      <td>{{ bonus.date.strftime('%d/%m/%y')}}</td>
+      <td>{{ bonus.trading_code }}</td>
+      {% if '_' in bonus.script %}
+      <td>{{ bonus.script | replace('_', '&') }}</td>
+      {% else %}
+      <td>{{ bonus.script }}</td>
+      {% endif %}
+      <td>{{ bonus.qty }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="text-center paginated">
+  {% for bonus_page_num in bonus_stocks.iter_pages(left_edge=1, right_edge=1,
+  left_current=1, right_current=2) %} {% if bonus_page_num %} {% if
+  bonus_stocks.page == bonus_page_num %}
+  <a
+    class="btn mb-4"
+    id="btn-current"
+    href="{{ url_for('bonus_history_page', page=bonus_page_num) }}"
+    >{{ bonus_page_num }}</a
+  >
+  {% else %}
+  <a
+    class="btn btn-outline-info mb-4"
+    href="{{ url_for('bonus_history_page', page=bonus_page_num) }}"
+    >{{ bonus_page_num }}</a
+  >
+  {% endif %} {% else %} ... {% endif %} {% endfor %}
+</div>
+
+{% endblock content %}
+
+<!-- functions for comma seprated digits -->
+{%- macro format_price(price, thousand_separator=',', decimal_separator='.',
+decimal_places=2) -%} {%- set price_as_string = price | string -%} {%- set
+price_split = price_as_string.split('.') -%} {%- set price_integer =
+price_split[0] -%} {%- if price_split | count > 1 -%} {%- set price_fraction =
+price_split[1] -%} {%- if price_fraction | length < decimal_places -%} {%- set
+price_fraction = price_fraction.ljust(decimal_places, '0') -%} {%- else -%} {%-
+set price_fraction = price_fraction[:decimal_places] -%} {%- endif -%} {%- else
+-%} {%- set price_fraction = '' -%} {%- endif -%} {%- set
+formatted_price_integer = price_integer | reverse | batch(3) | map('join', '') |
+join(thousand_separator) | reverse -%} {%- if price_fraction != '' -%} {%- set
+formatted_price = formatted_price_integer ~ decimal_separator ~ price_fraction
+-%} {%- else -%} {%- set formatted_price = formatted_price_integer-%} {%- endif
+-%} {{- formatted_price -}} {%- endmacro -%}

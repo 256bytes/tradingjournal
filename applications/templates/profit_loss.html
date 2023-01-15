@@ -33,7 +33,11 @@
                 <td></td>
                 <td>{{ pl.date.strftime('%d/%m/%y') }}</td>
                 <td>{{ pl.trading_code }} </td>
-                <td>{{ pl.script }}</td>
+                {% if '_' in pl.script %}
+                     <td>{{ pl.script | replace('_', '&') }}</td>
+                {% else %}
+                    <td>{{ pl.script }}</td>
+                {% endif %}
                 <td>{{ pl.qty }}</td>
                 {% if pl.qty > 0 %}
                 <td>{{ format_price(pl.net_rate_per_unit ) }}</td>

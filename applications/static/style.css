@@ -66,17 +66,21 @@ nav, .form_bg, .modal-content {
     
 }
 
-
+.list-group-item{
+    background-color: #373737;
+    color: white;
+}
 /*
 .table {
     counter-reset: serial-number;  Set the serial number counter to 0
   }
 
 .table td:first-child:before {
-    counter-increment: serial-number;  Increment the serial number counter
-    content: counter(serial-number);  Display the counter 
+    counter-increment: serial-number;  /* Increment the serial number counter
+    content: counter(serial-number);  /* Display the counter 
   }
 */
+
 .strips {
     background-color: #9b9b9b20;
     color: white;

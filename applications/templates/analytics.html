@@ -67,7 +67,7 @@
 
 <div class="row"> <!--div second row starts (table)-->
     <div> <!--div col starts-->
-        <table class="table table-dark table-striped table-sm tableFixHead" id="data">
+        <table class="table table-dark table-striped table-sm tableFixHead">
             <thead>
                 <tr>
                     <th>#</th>
@@ -155,6 +155,59 @@
             
     </div> <!--div col ends-->
 <div class="row"> <!--div second row ends (table)-->
+
+
+
+    <div hidden>
+        <table class="table table-dark table-striped table-sm tableFixHead" id="data">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Date</th>
+                    <th>Script</th>
+                    <th>Price</th>
+                    <th>Call</th>
+                    <th>Stop_loss</th>
+                    <th>Target</th>
+                    <th>Time_Frame</th>
+                    <th>Analyst</th>
+                    <th>Sl/Tgt</th>
+                    <th>Performance</th>
+                    <th>Resource</th>
+                    <th>Holdings</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for analytic in analysis.items %}
+                {% set outer_loop = loop %}
+                    {% for hold in chk_holdings %}
+                        {% if outer_loop.index0 == loop.index0 %}
+                {% include 'includes/resource_modal.html' %}
+                            <form action="/delete_analysis" method='POST'>
+                                <tr>
+                                    <td></td>
+                                    <td>{{ analytic.date }}</td>
+                                    <td>{{ analytic.script }}</td>
+                                    <td>{{ format_price(analytic.price) }}</td>
+                                    <td>{{ analytic.call }}</td>
+                                    <td>{{ format_price(analytic.stop_loss) }}</td>
+                                    <td>{{ format_price(analytic.target) }}</td>
+                                    <td>{{ analytic.time_frame }} days</td>
+                                    <td>{{ analytic.analyst }}</td>
+                                    <td>todo</td>
+                                    <td>performance</td>
+                                    <td>
+                                        {{ analytic.resource }}
+                                    </td>
+                                    <td>{{ hold.holding }}</td>
+                                </tr>
+                            </form>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock content %}
 
 <!-- functions for comma seprated digits -->
