@@ -39,7 +39,6 @@ def settings_page():
                 
             except Exception as e:
                 flash(f"Something went wrong: {e}", category='danger')
-                print(f'something went wrong! {e}')
         #------------------------------------------------------------------------Check and Update
         new_eq_it_val = request.form.get('new_equity_intraday')
         old_eq_it_val = request.form.get('old_equity_intraday')

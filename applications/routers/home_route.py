@@ -22,9 +22,6 @@ def home_page():
     for brokers_code in brokers:
         i = db.session.query(func.sum(Transactions.net_total).label("total")).filter(Transactions.user_id == current_user.id, Transactions.trading_code == brokers_code.trading_code).first()
         f = db.session.query(Funds).filter(Funds.user_id == current_user.id, Funds.trading_code == brokers_code.trading_code).all()
-        print('\n')
-        print(i)
-        print('\n')
         if i:
             investments.append(i)
         else:
@@ -33,10 +30,10 @@ def home_page():
             # This block gets the pay in, pay out, debit and credit to calculate the net balance.
             # So that it can displayed in dashboard.
             f_in = db.session.query(func.sum(Funds.pay_in).label('pay_in_funds')).filter(Funds.user_id == current_user.id, Funds.trading_code == brokers_code.trading_code).first()
-            deb = db.session.query(func.sum(Funds.debits).label('debit')).filter(Funds.user_id == current_user.id, Funds.trading_code == brokers_code.trading_code).first()
-            cred = db.session.query(func.sum(Funds.credits).label('credit')).filter(Funds.user_id == current_user.id, Funds.trading_code == brokers_code.trading_code).first()
+            # deb = db.session.query(func.sum(Funds.debits).label('debit')).filter(Funds.user_id == current_user.id, Funds.trading_code == brokers_code.trading_code).first()
+            # cred = db.session.query(func.sum(Funds.credits).label('credit')).filter(Funds.user_id == current_user.id, Funds.trading_code == brokers_code.trading_code).first()
             f_out = db.session.query(func.sum(Funds.pay_out).label('pay_out_funds')).filter(Funds.user_id == current_user.id, Funds.trading_code == brokers_code.trading_code).first()
-            net_bal = ((float(f_in.pay_in_funds) + float(cred.credit)) - (float(deb.debit) + float(f_out.pay_out_funds)))
+            net_bal = ((float(f_in.pay_in_funds)  -  (float(f_out.pay_out_funds))))
 
             funds.append(net_bal)
 
