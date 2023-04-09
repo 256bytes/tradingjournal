@@ -3,8 +3,8 @@ simple and easy to save your daily stock tradings.
 Working on intraday section,it will be soon updated.
 For deliveries/cnc web app works fine.
 
-# Holding page will have previous close instead of ltp,
-this helps to load the page faster as it draws from bhavcopy downloaded from nse.
+# Holding page
+Last traded price was replaced by previous close as this helps to load the page faster as it draws from bhavcopy downloaded from nse.
 
 # What you should expect?
 Once you add your broking account/s, you could add stocks from holdings page by clicking buy.
