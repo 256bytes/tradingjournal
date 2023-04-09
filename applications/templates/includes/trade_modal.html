@@ -1,12 +1,12 @@
 
 <!-- Sell Modal -->
- <div class="modal fade" id="Modal-Sell-{{ holding.script }}"
-            tabindex="-1" aria-labelledby="Modal-Sell" aria-hidden="true"> <!--div modal fade starts-->
+<div class="modal fade" id="Modal-Sell-{{ holding.script }}"
+            tabindex="-1" aria-labelledby="Modal-Sell" aria-hidden="True" style="opacity: 1 !important"> <!--div modal fade starts-->
    <div class="modal-dialog"> <!--div modal-dialog starts-->
      <div class="modal-content"> <!--div modal-content starts-->
        <div class="modal-header"> <!--div modal-header starts-->
          <div><h5 class="modal-title">Script: {{ holding.script }}</h5></div>
-         <div><h5 class="modal-title">LTP: {{ format_price(my_ltp(holding.script)) }}</h5></div>
+         
          <div><h5 class="modal-title">Sell Shares</h5></div>
        </div> <!--div modal-header ends-->
        <div class="modal-body">
@@ -59,6 +59,8 @@
    </div> <!--div modal-dialog ends-->
  </div> <!--div modal fade ends-->
 
+ 
+
 
 
 <!-- Buy Modal -->
@@ -86,14 +88,15 @@
           </div>
 
           <div class="mb-3">
-            <label class="col-form-label">LTP</label>
+            <label class="col-form-label">Price</label>
             {% if (holding.shares | int) > 0 %}
               {% set avg =  (holding.total_investments | int) / (holding.shares | int) %}
             {% else %}
             {% set avg =  0 %}
             {% endif %}
+            
             <input type="hidden" class="form-control" name="old_price" value="{{ value }}">
-            <input type="text" class="form-control" name="price" value="{{ value }}">
+            <input type="text" class="form-control" name="price" value="{{ value }}", placeholder="Prev Close: {{ my_prev_close(holding.script) }}">
           </div>
 
           <div class="form-group">
@@ -119,4 +122,25 @@
 </div> <!--div modal fade ends-->
 
 
+{%- macro format_price(price, thousand_separator=',', decimal_separator='.', decimal_places=2) -%}
+{%- set price_as_string = price | string -%}
+{%- set price_split = price_as_string.split('.') -%}
+{%- set price_integer = price_split[0] -%}
+{%- if price_split | count > 1 -%}
+{%- set price_fraction = price_split[1] -%}
+{%- if price_fraction | length < decimal_places -%}
+{%- set price_fraction = price_fraction.ljust(decimal_places, '0') -%} 
+{%- else -%}
+{%- set price_fraction = price_fraction[:decimal_places] -%}
+{%- endif -%}
+{%- else -%}
+{%- set price_fraction = '' -%}
+{%- endif -%}
+{%- set formatted_price_integer = price_integer | reverse | batch(3) | map('join', '') | join(thousand_separator) | reverse -%}
+{%- if price_fraction != '' -%}
+{%- set formatted_price = formatted_price_integer ~ decimal_separator ~ price_fraction -%}
+{%- else -%}
+{%- set formatted_price = formatted_price_integer-%}
+{%- endif -%}
+{{- formatted_price -}} {%- endmacro -%}
   

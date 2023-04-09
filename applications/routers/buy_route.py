@@ -7,7 +7,7 @@ from applications.forms import BuyForm
 from applications.models import Brokers, Users, Transactions, Funds
 from applications.database import db
 from applications.helpers import lookup, chk_special
-from applications.calc_taxes.get_taxes import CaluculateBrokerageAndTaxes
+from applications.calc_taxes.get_taxes import CalculateBrokerageAndTaxes
 
 
 
@@ -77,9 +77,9 @@ def buy_page():
             return render_template('/home.html', buy_form=buy_form, t_code=t_code)
 
         try:
-            result = CaluculateBrokerageAndTaxes(code, current_user.id, price, share_qty, call)
+            result = CalculateBrokerageAndTaxes(code, current_user.id, price, share_qty, call)
         except Exception as e:
-                flash(f"Something went wrong while getting the result. error: {e}", category='warning')
+                flash(f"Something went wrong while calculating brokerage and taxes. error: {e}", category='warning')
                 return redirect(url_for('holdings_page'))
 
         #-------------------------- Updating Funds table ---------------------------------------------------
@@ -121,7 +121,7 @@ def buy_page():
             db.session.add(script_to_add)
             db.session.commit()
             flash("Script successfully added!", category='success')
-            return redirect(url_for('buy_page'))
+            return redirect(url_for('holdings_page'))
         except Exception as e:
             flash(f"Something went wrong while inserting the data to the transaction table. error: {e}", category='warning')
             return redirect(url_for('buy_page'))

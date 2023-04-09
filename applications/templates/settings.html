@@ -2,69 +2,73 @@
 {% block title %}Settings{% endblock title %}
 
 {% block content %}
-<div class="container form_bg">
+<div class="container form_bg"> <!--div container starts-->
     <hr>
-    <div class="row text-center">                       <!--First row-->
-        <div class="col-4">
-            <h3 class="text-center">User Details</h3>
+    <div class="row text-center"> <!--First row-->
+        
+        <div class="col-4 user_settings"> <!--div first column starts (User Details block )-->
+            <h6 class="text-center">User Details</h6>
+            {% set del_user = ""%}
             {% for user in users %}
-                <table class="table table-dark table-striped table-sm">
+            {% include 'includes/delete_my_account_modal.html' %}
+                <table class="table table-light table-striped table-sm">
                     <thead style="height: 65px">
                         <tr>
-                            <th>#</th>
                             <th>Name</th>
                             <th>Email</th>
                         </tr>
                     </thead>
                     <tbody style="height: 65px">
                         <tr>
-                            <td></td>
                             <td>{{ user.username }}</td>
                             <td>{{ user.email }}</td>
+                            <td><button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#Modal-Del-{{ user.id }}">Delete Account</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            
+            {% endfor %}
+      
+        </div> <!--div first column ends (User Details block )-->
+
+        <div class="col-8 user_settings"> <!--div second column starts (Taxes details )-->
+            <h6 class="text-center">Tax Details</h6>
+            {% for tax in taxes %}
+                <table class="table table-light table-striped table-sm">
+                    <thead style="height: 65px">               
+                        <tr>
+                            <th>#</th>
+                            <th>GST</th>
+                            <th>SEBI Chgs</th>
+                            <th colspan="2">STT</th>
+                            <th colspan="2">Stamp Duty</th>
+                        </tr>
+                    </thead>
+                    <tbody style="height: 65px">
+                        <tr>
+                            <td></td>
+                            <td>{{ tax.gst }}&#37;</td>
+                            <td>{{ tax.sebi_chgs }}&#37;</td>
+                            <td>Delivery: {{ tax.stt_delivery }}&#37;</td>
+                            <td>Intraday: {{ tax.stt_intraday }}&#37;</td>
+                            <td>Delivery: {{ tax.stamp_duty_delivery }}&#37;</td>
+                            <td>Intraday: {{ tax.stamp_duty_intraday }}&#37;</td>
                         </tr>
                     </tbody>
                 </table>
             {% endfor %}
-        </div>
-        <div class="col-8"> 
-            <h3 class="text-center">Tax Details</h3>
-            {% for tax in taxes %}
-            <table class="table table-dark table-striped table-sm">
-                <thead style="height: 65px">               
-                    <tr>
-                        <th>#</th>
-                        <th>GST</th>
-                        <th>SEBI Chgs</th>
-                        <th colspan="2">STT</th>
-                        <th colspan="2">Stamp Duty</th>
-                    </tr>
-                </thead>
-                <tbody style="height: 65px">
-                    <tr>
-                        <td></td>
-                        <td>{{ tax.gst }}&#37;</td>
-                        <td>{{ tax.sebi_chgs }}&#37;</td>
-                        <td>Delivery: {{ tax.stt_delivery }}&#37;</td>
-                        <td>Intraday: {{ tax.stt_intraday }}&#37;</td>
-                        <td>Delivery: {{ tax.stamp_duty_delivery }}&#37;</td>
-                        <td>Intraday: {{ tax.stamp_duty_intraday }}&#37;</td>
-                    </tr>
-                </tbody>
-            </table>
-        {% endfor %}
-        </div>
+        </div> <!--div second column ends (Taxes details )-->
 
-            
-    </div><!--div first row ends-->
+    </div> <!--div first row ends-->
+
     <hr>
-
-
     <div class="strips">
-        <h3 class="text-center bg-secodary">Brokers Details <a class="btn btn-secondary btn-sm" href="{{ url_for('add_brokers_page') }}">Add Brokers</a></h3>
+        <h6 class="text-center bg-secodary">Brokers Details <a class="btn btn-secondary btn-sm" href="{{ url_for('add_brokers_page') }}">Add Brokers</a></h6>
     </div>
     <hr>
-    <div class="row mx-2">                                      <!--Second row-->
-        <table class="table table-dark table-striped table-sm">
+
+    <div class="row mx-2"> <!--div second row starts-->
+        <table class="table table-light table-striped table-sm">
             <thead>
                 <tr>
                     <th class="scope">#</th>
@@ -95,7 +99,7 @@
                                 <td>{{ brokers.transaction_chgs }}</td>
                                 <td>{{ brokers.dp_chgs }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop-{{ brokers.id }}">
+                                    <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop-{{ brokers.id }}">
                                         Edit
                                     </button>
                                     <button type="button" class="btn btn-outline-secodary btn-sm" data-bs-toggle="modal" data-bs-target="#addFunds-{{ item.id }}">
@@ -114,10 +118,10 @@
         </table>
     </div><!--div second row ends -->
     <hr>
-
     <br>
     <div class="footer text-center">
         <a class="btn btn-secondary btn-sm mb-3" href="{{ url_for('home_page') }}">Close</a>
     </div>
+
 </div> <!--div container ends-->
 {% endblock content %}

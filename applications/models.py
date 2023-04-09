@@ -6,8 +6,8 @@ from alembic import op
 import datetime
 
 
-from applications.database import db, bcrypt
-from applications.database import login_manager
+from applications.database import bcrypt, login_manager
+from applications.database import db
 
 
 
@@ -20,7 +20,7 @@ class Users(db.Model, UserMixin):
 
     __tablename__ = "users"
 
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True, autoincrement=True, nullable=False)
     date = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     username = db.Column(db.String(45), unique=True, nullable=False)
     email = db.Column(db.String(45), unique=True, nullable=False)
@@ -46,7 +46,7 @@ class List_of_brokers(db.Model):
 
     __tablename__ = "list_of_brokers"
 
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True, autoincrement=True, nullable=False)
     name = db.Column(db.String(length=45), nullable=False)
     type = db.Column(db.Boolean())
     equity_delivery = db.Column(db.Float())
@@ -58,8 +58,8 @@ class Brokers(db.Model):
 
     __tablename__ = "brokers"
 
-    id = db.Column(db.Integer(), primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
+    id = db.Column(db.Integer(), primary_key=True, autoincrement=True, nullable=False)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE', deferrable=False))
     name = db.Column(db.String(length=45), nullable=False)
     trading_code = db.Column(db.String(length=45), nullable=False)
     type = db.Column(db.Boolean())
@@ -79,8 +79,8 @@ class Transactions(db.Model):
 
     __tablename__ = "transactions"
 
-    id = db.Column(db.Integer(), primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
+    id = db.Column(db.Integer(), primary_key=True, autoincrement=True, nullable=False)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE', deferrable=False))
     date = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     type = db.Column(db.String(length=10), nullable=False)
     call = db.Column(db.String(length=10), nullable=False)
@@ -105,9 +105,9 @@ class Funds(db.Model):
 
     __tablename__ = "funds"
 
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True, autoincrement=True, nullable=False)
     date = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
-    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE', deferrable=False))
     trading_code = db.Column(db.String(length=45), nullable=False)
     pay_in = db.Column(db.Integer(), default=0.00, nullable=False)
     debits = db.Column(db.Float(), default=0.00, nullable=False)
@@ -119,8 +119,8 @@ class Research(db.Model):
 
     __tablename__ = "research"
 
-    id = db.Column(db.Integer(), primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
+    id = db.Column(db.Integer(), primary_key=True, autoincrement=True, nullable=False)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE', deferrable=False))
     date = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
     script = db.Column(db.String(length=50))
     price = db.Column(db.Float())
@@ -136,7 +136,7 @@ class Taxes(db.Model):
 
     __tablename__ = "taxes"
 
-    id = db.Column(db.Integer(), primary_key=True, nullable=False)
+    id = db.Column(db.Integer(), primary_key=True, autoincrement=True, nullable=False)
     stt_delivery = db.Column(db.Float(), nullable=False)
     stt_intraday = db.Column(db.Float(), nullable=False)
     gst = db.Column(db.Float(), nullable=False)
@@ -148,7 +148,7 @@ class Analysts(db.Model):
 
     __tablename__ = "analysts"
 
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True, autoincrement=True, nullable=False)
     name = db.Column(db.String(100))
     number_of_calls = db.Column(db.Integer())
     stoploss_target = db.Column(db.Integer(), nullable=False, default=0)
@@ -157,7 +157,7 @@ class Analysts(db.Model):
 
 # class Test(db.Model):
     
-#     id = db.Column(db.Integer(), primary_key=True)
+#     id = db.Column(db.Integer(), primary_key=True, autoincrement=True)
 #     account = db.Column(db.String(length=10))
 #     script = db.Column(db.String(length=10))
 #     total_qty = db.Column(db.String(length=10))

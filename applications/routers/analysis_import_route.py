@@ -6,8 +6,8 @@ import os
 #-------------User Packages --------------------#
 from applications import app
 from applications.models import Analysts, Research
-from applications.helpers import lookup
 from applications.database import db
+from applications.helpers import lookup
 
 @app.route('/analysis_import', methods=["GET","POST"])
 @login_required

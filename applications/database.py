@@ -1,3 +1,6 @@
+import os
+import sqlite3
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
@@ -8,8 +11,10 @@ from applications.config import settings
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:8thNov2022@localhost/trading_journal'
 # app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{settings.database_username}:{settings.database_password}@{settings.database_hostname}/{settings.database_name}'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/sundaram/ICode/tradingJournal/journal.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.root_path, '../journal.db')
+# app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
+
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view="login_page"

@@ -18,9 +18,9 @@ class RegisterForm(FlaskForm):
 
     username = StringField(label='User Name:', validators=[Length(min=3, max=45), DataRequired()])
     email = StringField(label='Email:', validators=[Email(), DataRequired()])
-    password = PasswordField(label='Password', validators=[Length(min=3), DataRequired()])
-    confirmation = PasswordField(label='Confirmation Password', validators=[EqualTo('password'), DataRequired()])
-    submit = SubmitField(label='Register')
+    password = PasswordField(label='Password:', validators=[Length(min=3), DataRequired()])
+    confirmation = PasswordField(label='Confirmation Password:', validators=[EqualTo('password'), DataRequired()])
+    submit = SubmitField(label='Sign up')
 
 class AddBrokersForm(FlaskForm):
     name = SelectField(label="Name", choices=[])
@@ -36,7 +36,7 @@ class EditBrokerForm(FlaskForm):
 
 class LoginFrom(FlaskForm):
     username = StringField(label='User Name:', validators=[DataRequired()])
-    password = PasswordField(label='Password', validators=[DataRequired()])
+    password = PasswordField(label='Password:', validators=[DataRequired()])
     submit = SubmitField(label='Log in')
 
 class BuyForm(FlaskForm):
@@ -107,3 +107,7 @@ class WithdrawFunds(FlaskForm):
     trading_code = StringField(label='Trading Code', validators=[DataRequired()])
     withdraw_funds = FloatField(label='Withdraw Funds:', validators=[DataRequired()])
     submit = SubmitField(label="Pay out")
+
+class DeleteMyAccount(FlaskForm):
+    submit = SubmitField(label="Pay out")
+

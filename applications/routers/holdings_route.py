@@ -12,7 +12,9 @@ from applications.helpers import multiple_group
 
 @app.route('/holdings', methods=['GET', 'POST'])
 @login_required
-def holdings_page(): 
+def holdings_page():
+    
+
     sell_form = SellForm()
     add_form = AddForm()
     add_bonus = AddBonusForm()

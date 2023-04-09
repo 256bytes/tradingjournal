@@ -6,7 +6,7 @@ from sqlalchemy import func
 from applications import app
 from applications.models import Brokers, Transactions, Funds
 from applications.database import db
-from applications.calc_taxes.get_taxes import CaluculateBrokerageAndTaxes
+from applications.calc_taxes.get_taxes import CalculateBrokerageAndTaxes
 
 @app.route('/sell', methods=['GET', 'POST'])
 @login_required
@@ -50,7 +50,7 @@ def sell_page():
             
             try:
                 # compute taxes and other charges.
-                result = CaluculateBrokerageAndTaxes(t_code, current_user.id, float(sell_price), int(sell_qty), call)
+                result = CalculateBrokerageAndTaxes(t_code, current_user.id, float(sell_price), int(sell_qty), call)
             except Exception as e:
                 flash(f"Something went wrong while getting the result. error: {e}", category='warning')
                 return redirect(url_for('sell_page'))

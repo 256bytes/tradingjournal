@@ -1,7 +1,7 @@
 
 from applications.models import Taxes, Brokers
 
-class CaluculateBrokerageAndTaxes():
+class CalculateBrokerageAndTaxes():
 
     def __init__(self, code, user_id, price, qty, call ):
 

@@ -6,7 +6,6 @@ from flask_login import current_user, login_required
 #-------------User Packages --------------------#
 from applications import app
 from applications.models import Transactions
-from applications.database import db
 
 @app.route('/buy_history')
 @login_required

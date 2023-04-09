@@ -10,14 +10,44 @@
 
 
     <!-- Custom Style CSS -->
+    
     <link href="{{ url_for('static', filename='style.css')}}" rel="stylesheet" type="text/css">
+
     
     <title>{% block title %}{% endblock title %}</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        $('#export-btn').click(function() {
+          var table = $('#my-table').html();
+          var filename = prompt("Enter file name:");
+          if (filename != null) {
+            $.ajax({
+              url: '/export',
+              type: 'POST',
+              data: {table: table, filename: filename},
+              success: function(data) {
+                window.location.href = '/export';
+              }
+            });
+          }
+        });
+      });
+    </script>
+
+    
+    
   </head>
+
+
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="navbar navbar-expand-sm navbar-dark">
         <div class="container-fluid">
-          <img class='mb-1' src="{{ url_for('static', filename='images/new_version_logo.png') }}" width=50 alt="Website Logo">
+          <div class="logo">
+            <img class='mb-1' src="{{ url_for('static', filename='images/nav_dark_logo.png') }}" width=50 alt="Website Logo">
+            <h6 class="title">Trading Journal</h6>
+          </div>
          
           <!--<a class="navbar-brand" href="#"> My Trading Journal</a>-->
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,7 +63,7 @@
               <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('holdings_page') }}">Holdings</a>
               </li>
-              <li class="nav-item dropdown dropdown">
+              <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false mx-50">
                   History
                 </a>
@@ -63,7 +93,7 @@
                   </a>
                   <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" href="{{ url_for('settings_page') }}">Settings</a></li>
-                    <li><a class="dropdown-item" href="#">Another action</a></li>
+                    <li></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" href="{{ url_for('logout_page') }}">Logout</a></li>
                   </ul>

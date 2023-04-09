@@ -1,49 +1,52 @@
 {% extends 'layout.html' %} {% block title %}Bonus History{% endblock title %}
 {% block content %}
-<table class="table table-dark table-striped table-sm tableFixHead">
-  <thead>
-    <div class="history_headings"><h3>Bonus History Table</h3></div>
-    <tr>
-      <th>Date</th>
-      <th>Account</th>
-      <th>Script</th>
-      <th>Qty</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for bonus in bonus_stocks.items %}
-    <tr>
-      <td>{{ bonus.date.strftime('%d/%m/%y')}}</td>
-      <td>{{ bonus.trading_code }}</td>
-      {% if '_' in bonus.script %}
-      <td>{{ bonus.script | replace('_', '&') }}</td>
-      {% else %}
-      <td>{{ bonus.script }}</td>
-      {% endif %}
-      <td>{{ bonus.qty }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="table"> <!--div table column starts -->
 
-<div class="text-center paginated">
-  {% for bonus_page_num in bonus_stocks.iter_pages(left_edge=1, right_edge=1,
-  left_current=1, right_current=2) %} {% if bonus_page_num %} {% if
-  bonus_stocks.page == bonus_page_num %}
-  <a
-    class="btn mb-4"
-    id="btn-current"
-    href="{{ url_for('bonus_history_page', page=bonus_page_num) }}"
-    >{{ bonus_page_num }}</a
-  >
-  {% else %}
-  <a
-    class="btn btn-outline-info mb-4"
-    href="{{ url_for('bonus_history_page', page=bonus_page_num) }}"
-    >{{ bonus_page_num }}</a
-  >
-  {% endif %} {% else %} ... {% endif %} {% endfor %}
-</div>
+  <div class='text-center'><h3>Bonus History Table</h3></div>
+  <table class="table table-light table-striped table-sm tableFixHead">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Account</th>
+        <th>Script</th>
+        <th>Qty</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for bonus in bonus_stocks.items %}
+      <tr>
+        <td>{{ bonus.date.strftime('%d/%m/%y')}}</td>
+        <td>{{ bonus.trading_code }}</td>
+        {% if '_' in bonus.script %}
+        <td>{{ bonus.script | replace('_', '&') }}</td>
+        {% else %}
+        <td>{{ bonus.script }}</td>
+        {% endif %}
+        <td>{{ bonus.qty }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <div class="text-center paginated"> <!--div paginated starts -->
+    {% for bonus_page_num in bonus_stocks.iter_pages(left_edge=1, right_edge=1,
+    left_current=1, right_current=2) %} {% if bonus_page_num %} {% if
+    bonus_stocks.page == bonus_page_num %}
+    <a
+      class="btn btn-secondary mb-4"
+      id="btn-current"
+      href="{{ url_for('bonus_history_page', page=bonus_page_num) }}"
+      >{{ bonus_page_num }}</a
+    >
+    {% else %}
+    <a
+      class="btn btn-outline-info mb-4"
+      href="{{ url_for('bonus_history_page', page=bonus_page_num) }}"
+      >{{ bonus_page_num }}</a
+    >
+    {% endif %} {% else %} ... {% endif %} {% endfor %}
+  </div> <!--div paginated ends -->
+</div> <!--div table column ends -->
 
 {% endblock content %}
 

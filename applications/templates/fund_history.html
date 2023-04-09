@@ -2,13 +2,11 @@
 {% block title %}Fund History{% endblock title %}
 
 {% block content %}
-<div class="row"> <!--div first row starts -->
-    <div class="4"> <!--div first column starts --></div> <!--div first column ends -->
-        <div class="4"> <!--div second column starts -->
-            <table class="table table-dark table-striped table-sm tableFixHead">
+        <div class="table"> <!--div table column starts -->
+            <div class='text-center'><h3>Fund History Table</h3></div>
+            <table class="table table-light table-striped table-sm tableFixHead">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
                         <th scope="col">date</th>
                         <th scope="col">Trading Account</th>
                         <th scope="col">Pay In</th>
@@ -20,7 +18,6 @@
                 <tbody>
                         {% for fd in fund_data.items %}
                         <tr>
-                            <td></td>
                             <td>{{ fd.date }}</td>
                             <td>{{ fd.trading_code }}</td>
                             <td>{{ format_price (fd.pay_in )}}</td>
@@ -31,11 +28,11 @@
                         {% endfor %}
                 </tbody>
             </table>
-            <div class="text-center paginated">
+            <div class="text-center paginated"> <!--div paginated starts -->
                 {% for page_num in fund_data.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
                     {% if page_num %}
                         {% if fund_data.page == page_num %}
-                            <a class="btn mb-4" id="btn-current" href="{{ url_for('fund_history_page', page=page_num) }}">{{ page_num }}</a>
+                            <a class="btn btn-secondary mb-4" id="btn-current" href="{{ url_for('fund_history_page', page=page_num) }}">{{ page_num }}</a>
                         {% else %}
                             <a class="btn btn-outline-info mb-4" href="{{ url_for('fund_history_page', page=page_num) }}">{{ page_num }}</a>
                         {% endif %}
@@ -44,9 +41,7 @@
                     {% endif %}
                 {% endfor %}
             </div> <!--div paginated ends -->
-        </div> <!--div second column ends -->
-    <div class="4"> <!--div third column starts --></div> <!--div third column ends -->
-</div><!--div first row ends -->
+        </div> <!--div table column ends -->
 {% endblock content %}
 
 {%- macro format_price(price, thousand_separator=',', decimal_separator='.', decimal_places=2) -%}

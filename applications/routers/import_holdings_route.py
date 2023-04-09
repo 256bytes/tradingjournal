@@ -6,9 +6,10 @@ import os
 #-------------User Packages --------------------#
 from applications import app
 from applications.models import Brokers, Transactions
-from applications.helpers import lookup, chk_special
 from applications.database import db
-from applications.calc_taxes.get_taxes import CaluculateBrokerageAndTaxes
+from applications.helpers import lookup, chk_special
+from applications.calc_taxes.get_taxes import CalculateBrokerageAndTaxes
+from applications.calc_taxes.remove_taxes import RemoveBrokerage
 
 @app.route('/data_import', methods=["GET","POST"])
 @login_required
@@ -64,13 +65,24 @@ def import_data_form():
             broker_name = db.session.query(Brokers.name).filter(Brokers.user_id == current_user.id, Brokers.trading_code == tc).first()
 
             if not chk_script:
+                print("\n")
+                print("inside if chk_script block and script is not valid")
+                print("\n")
                 flash("Invalid symbol {script}", category='warning')
                 os.remove(f.filename)
                 return redirect(url_for('holdings_page'))
                 break
 
             try:
-                result = CaluculateBrokerageAndTaxes(tc, current_user.id, price, qty, call)
+                price_without_brokerage = RemoveBrokerage(tc, current_user.id, price, qty)
+                print("\n")
+                print("\n")
+                print(f"price with brokerage: {price}")
+                print(price_without_brokerage.r_rpu)
+                print("\n")
+                print("\n")
+
+                result = CalculateBrokerageAndTaxes(tc, current_user.id, price_without_brokerage.r_rpu, qty, call)
             except Exception as e:
                 flash(f"Something went wrong while getting the result. error: {e}", category='warning')
                 os.remove(f.filename)
@@ -85,7 +97,7 @@ def import_data_form():
                                 type = "CNC",
                                 call = 'Buy',
                                 script = symb,
-                                price = price,
+                                price = price_without_brokerage.r_rpu,
                                 qty = qty,
                                 brokerage_per_unit = result.r_b,
                                 net_rate_per_unit = result.r_rpu,

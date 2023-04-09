@@ -1,144 +1,60 @@
-body {
-    margin: 0;
-    background-color:  #2c2c2c;
-    color: white;
+body{
+    background-color: whitesmoke;
     font-family: sans-serif;
 }
 
-.dropdown-item {
-    color: white;
+/* div form */
+.form_bg{
+    box-shadow: 10px 12px 10px rgba(0,0,0,0.1);
 }
 
-.dropdown-item:hover, .dropdown-item:active {
-    color: white;
-    text-decoration: none;
-    background-color: #373737;
+/* div for form */
+form, div.border-top {
+    margin: 8px;
+}
+
+/* forms */
+.form-control:focus {
+    border: 2px solid rgb(255, 102, 0);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(255, 102, 0, 0.6);
+    outline: none; 
+    background-color: #ffffff;
   }
 
-.dropdown-item:focus{
-    background-color: #525252;
-    color: white;
+/* Logo and Brand Name */
+div.logo{
+    display: flex;
+}
+h6.title, div.user_settings, div.table{
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
 
-nav, .form_bg, .modal-content {
+/* Logo on login and register page */
+img.logo{
+    margin-right: 1rem;
+    width: 100px;
+}
+
+/* Home page cards */
+div.card{
+    margin: 5px;
+}
+
+
+/* Nav bar dark */
+nav{
     background-color: #222222;
     color: white;
 }
-
-.form-control{
-    background-color: #2c2c2c;
-    color: white;
-}
-
-.form-control:focus{
-    background-color: #2c2c2c;
-    border-color: rgb(255, 102, 0);
-    box-shadow: 0 2px 4px rgba(255, 102, 0, 0.3);
-    color: white;
-}
-.navbar-nav > li > .dropdown-menu { 
-    background-color: #222222;
-    color: white
-}
-
-
-.btn:focus .btn:active:focus, .btn.active:focus, .btn-primary:hover, .btn-primary:focus, .btn-primary:active{
-    outline: 0 none;
-    box-shadow: 0 2px 4px rgba(255, 102, 0, 0.3);
-}
-
-.btn, .btn-secondary{
-    background-color: #373737;
-    color: white;
-    border-color: rgb(201, 201, 201);
-}
-
-.btn-primary:hover, .btn-secondary:hover, .btn-primary:focus, .btn-secondary:focus, .btn-primary:active, .btn-secondary-active {
-    background-color: #525252;
-    color: white;
-    border-color: rgb(255, 102, 0);
-    
-}
-
-.btn:active:focus, .btn:active:focus {
-    border-color: rgb(255, 102, 0);
-    box-shadow: 0 2px 4px rgba(255, 102, 0, 0.3);
-    
-}
-
-.list-group-item{
-    background-color: #373737;
-    color: white;
-}
-/*
-.table {
-    counter-reset: serial-number;  Set the serial number counter to 0
-  }
-
-.table td:first-child:before {
-    counter-increment: serial-number;  /* Increment the serial number counter
-    content: counter(serial-number);  /* Display the counter 
-  }
-*/
-
-.strips {
-    background-color: #9b9b9b20;
-    color: white;
-}
-
 
 /* FOR TABLE */
 .red {
     color: red;
 }
 
-.green{
-    color: #66ff00;
+.green {
+    color: #3c9401;
 }
-
-.tableFixHead {
-    overflow-y: auto; /* make the table scrollable if height is more than 200 px  */
-    height: 200px; /* gives an initial height of 200px to the table */
-  }
-  .tableFixHead thead th {
-    position: sticky; /* make the table heads sticky */
-    top: 0px; /* table head will be placed from the top of the table and sticks to it */
-  }
-
-  .history_headings{
-    text-align: center;
-  }
-
-#btn-current{
-    background-color: rgb(255, 102, 0);
-}
-
-.card{
-    background-color: #222222;
-    color: white;
-    border: solid rgb(63, 63, 63);
-    padding: 5px;
-    margin: 5px;
-}
-
-h5 .card-currency{
-    color: #66ff00;
-}
-
-div .dashboard_cards{
-    float: left;
-    padding: 10px 10px;
-}
-/* 2c2c2c - Bg
-
-222222 - Nav
-
-373737 buttons
-
-3a3a3a hover
-e95420 selection or hover 
-rgb 255, 102, 0 border color
-web safe colors:
- #666666
-
-*/

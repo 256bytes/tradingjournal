@@ -1,51 +1,51 @@
 {% extends 'layout.html' %}
 {% block title %}Sell History{% endblock title %}
 {% block content %}
-
-<table class="table table-dark table-striped table-sm tableFixHead">
-    <thead><div class='history_headings'><h3>Sell History Table</h3></div>
-        <tr>
-            <th></th>
-            <th>Date</th>
-            <th>Account</th>
-            <th>Script</th>
-            <th>Qty</th>
-            <th>Sell Price</th>
-            <th>Brokerage Per Unit</th>
-            <th>Net Rate Per Unit</th>
-            <th>Net Total (before levies)</th>
-            <th>Total Taxes</th>
-            <th>Net Recieveable</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for ss in stocks_sold.items %}
+<div class="table"> <!--div table starts-->
+    <div class='text-center'><h3>Sell History Table</h3></div>
+    <table class="table table-light table-striped table-sm tableFixHead">
+        <thead>
             <tr>
-                <td></td>
-                <td>{{ ss.date.strftime('%d/%m/%y') }}</td>
-                <td>{{ ss.trading_code }}</td>
-                {% if '_' in ss.script %}
-                    <td>{{ ss.script | replace('_', '&') }}</td>
-                {% else %}
-                    <td>{{ ss.script }}</td>
-                {% endif %}
-                <td>{{ ss.qty |abs }}</td>
-                <td>{{ format_price(ss.price)}}</td>
-                <td>{{ format_price(ss.brokerage_per_unit) }}</td>
-                <td>{{ format_price(ss.net_rate_per_unit)}}</td>
-                <td>{{ format_price(ss.net_total_before_levies) }}</td>
-                <td>{{ format_price(ss.total_taxes) }}</td>
-                <td>{{ format_price(ss.net_total |abs)}}</td>
+                <th>Date</th>
+                <th>Account</th>
+                <th>Script</th>
+                <th>Qty</th>
+                <th>Sell Price</th>
+                <th>Brokerage Per Unit</th>
+                <th>Net Rate Per Unit</th>
+                <th>Net Total (before levies)</th>
+                <th>Total Taxes</th>
+                <th>Net Recieveable</th>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            {% for ss in stocks_sold.items %}
+                <tr>
+                    <td>{{ ss.date.strftime('%d/%m/%y') }}</td>
+                    <td>{{ ss.trading_code }}</td>
+                    {% if '_' in ss.script %}
+                        <td>{{ ss.script | replace('_', '&') }}</td>
+                    {% else %}
+                        <td>{{ ss.script }}</td>
+                    {% endif %}
+                    <td>{{ ss.qty |abs }}</td>
+                    <td>{{ format_price(ss.price)}}</td>
+                    <td>{{ format_price(ss.brokerage_per_unit) }}</td>
+                    <td>{{ format_price(ss.net_rate_per_unit)}}</td>
+                    <td>{{ format_price(ss.net_total_before_levies) }}</td>
+                    <td>{{ format_price(ss.total_taxes) }}</td>
+                    <td>{{ format_price(ss.net_total |abs)}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div> <!--div table ends-->
 
 <div class="text-center paginated">
     {% for sell_page_num in stocks_sold.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
         {% if sell_page_num %}
             {% if stocks_sold.page == sell_page_num %}
-                <a class="btn mb-4" id="btn-current" href="{{ url_for('sell_history_page', page=sell_page_num) }}">{{ sell_page_num }}</a>
+                <a class="btn btn-secondary mb-4" id="btn-current" href="{{ url_for('sell_history_page', page=sell_page_num) }}">{{ sell_page_num }}</a>
             {% else %}
                 <a class="btn btn-outline-info mb-4" href="{{ url_for('sell_history_page', page=sell_page_num) }}">{{ sell_page_num }}</a>
             {% endif %}

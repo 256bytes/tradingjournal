@@ -12,7 +12,8 @@ app = Flask(__name__)
 app.secret_key = secret
 
 
-# For comma seprated numbers
+
+# For comma separated numbers
 @app.template_filter()
 def numberFormat(value):
     a = str(value).split('.')
@@ -31,10 +32,10 @@ def numberFormat(value):
 from applications.routers import add_funds_route, import_holdings_route, login_route, register_route, add_broker_route, settings_route, home_route, buy_route, notes_route,\
             holdings_route, profit_loss_route, analytic_route, logout_route
 from applications.routers import analysis_import_route, sell_route, delete_analysis, add_bonus_route, sell_history_route, buy_history_route, delete_broker,\
-    fund_history_route, withdraw_funds_route, bonus_history_route
+    fund_history_route, withdraw_funds_route, bonus_history_route, delete_my_account
 
-from applications.helpers import my_ltp
-
-
+from applications.helpers import my_prev_close
+from applications.helpers import DownloadBhavcopy
+test = DownloadBhavcopy()
 
 

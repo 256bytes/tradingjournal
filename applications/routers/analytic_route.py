@@ -5,7 +5,7 @@ from sqlalchemy import func
 
 #-------------User Packages --------------------#
 from applications import app
-from applications.forms import ResearchForms, StoplossTargetRadio
+from applications.forms import ResearchForms
 from applications.models import Transactions, Research, Analysts
 from applications.database import db
 from applications.helpers import lookup

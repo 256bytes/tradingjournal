@@ -5,7 +5,7 @@ from sqlalchemy import func
 #-------------User Packages --------------------#
 from applications import app
 from applications.models import Transactions
-from applications.database import db
+
 
 @app.route('/sell_history')
 @login_required

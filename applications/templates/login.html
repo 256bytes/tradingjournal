@@ -4,29 +4,28 @@
     <div class="row text-center mt-3"> <!--div row starts-->
         <div class="col-4"> <!--div first column starts--></div> <!--div first column ends-->
         <div class="col-4 form_bg"> <!--div second column ends-->
-
-            <form method="POST" class="form-register mt-2 mb-2"> <!--form starts-->
+            <form method="POST" class="form-register"> <!--form starts-->
                 {{ form.hidden_tag() }}
 
-                <img class='mb-3' src="{{ url_for('static', filename='images/new_version_logo.png') }}" width=200 alt="Website Logo">
+                <img class='logo' src="{{ url_for('static', filename='images/new_light_logo.png') }}" width=200 alt="Website Logo">
                 <h6 class='h3 mb-3 font-weight-normal'><small>Log in</small></h6>
                 <br>
-                {{ form.username.label() }}
-                {{ form.username(class="form-control", autocomplete="off", placeholder="Username") }}
+                {{ form.username.label(class="form-control-label") }}
+                {{ form.username(class="form-control form-control-sm", autocomplete="off", placeholder="Username") }}
 
-                {{ form.password.label() }}
-                {{ form.password(class="form-control", placeholder="Password") }}
+                {{ form.password.label(class="form-control-label") }}
+                {{ form.password(class="form-control form-control-sm", placeholder="Password") }}
                 <br>
-                {{ form.submit(class="btn btn-primary btn-sm")}}
-
-                <br>
-                <p><small>Do not have an account?</small></p>
-                <a href="{{ url_for('register_page') }}" class="btn btn-secondary btn-sm">Register</a>
-
+                {{ form.submit(class="btn btn-secondary btn-sm")}}
             </form> <!--form ends-->
 
+            <div class="border-top pt-3 text-start">
+                <small class="text-muted">Do not have an account?
+                <a href="{{ url_for('register_page') }}" class="btn btn-outline-secondary btn-sm">Register</a>
+                </small>
+            </div>
         </div> <!--div second column ends-->
-
+        
         <div class="col-4"> <!--div third column starts--></div><!--div third column ends-->
     </div> <!--div row ends-->
 {% endblock content %}

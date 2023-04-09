@@ -14,6 +14,7 @@ def login_page():
     form = LoginFrom()
     if form.validate_on_submit():
 
+
         attempted_user = Users.query.filter_by(username=form.username.data).first()
         if attempted_user and attempted_user.check_password_correction(
             attempted_password=form.password.data
@@ -23,4 +24,5 @@ def login_page():
             return redirect(url_for('home_page'))
         else:
             flash(f'Username and password mismatch! Please try again', category='danger')
+            
     return render_template('login.html', form=form)
