@@ -3,7 +3,8 @@ simple and easy to save your daily stock tradings.
 Working on intraday section,it will be soon updated.
 For deliveries/cnc web app works fine.
 
-# Holdings page takes time to load as it pulls the ltp from nsepython api
+# Holding page will have previous close instead of ltp,
+this helps to load the page faster as it draws from bhavcopy downloaded from nse.
 
 # What you should expect?
 Once you add your broking account/s, you could add stocks from holdings page by clicking buy.
