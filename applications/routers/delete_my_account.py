@@ -3,33 +3,33 @@ from flask_login import current_user, login_required
 
 #-------------User Packages --------------------#
 from applications import app
-from applications.models import Transactions, Research, Funds, Brokers, Users
-from applications.database import db
 
 @app.route('/delete_my_account', methods=["GET", "POST"])
 @login_required
 def delete_my_account():
     
+
     if request.method == "POST":
 
+        #-------------User Packages --------------------#
+        from applications.user_database import GetUserData
         
         user_account_id = request.form.get('id')
+        user_account_id = int(user_account_id)
+        
+        if user_account_id == current_user.id:
 
-        db.session.rollback()
-        db.session.begin()
-        try:
-            Transactions.query.filter_by(user_id = user_account_id ).delete()
-            Research.query.filter_by(user_id = user_account_id ).delete()
-            Funds.query.filter_by(user_id = user_account_id ).delete()
-            Brokers.query.filter_by(user_id = user_account_id ).delete()
-            account_to_delete = Users.query.filter_by(id = user_account_id).first()
-            db.session.delete(account_to_delete)
-            db.session.commit()
-            flash(f"Successfully deleted the account", category='success')
-            return redirect(url_for('login_page'))
+            user_data = GetUserData(user_id=user_account_id)
+            result, message = user_data.delete_my_account()
+            if not result:
+                flash(message, category='danger')
+                return redirect(url_for('register_page'))
+            else:
+                flash(message, category='success')
+                return redirect(url_for('settings_page'))
+        else:
+            flash(f"User account id mismatch.", category='warning')
+            return redirect(url_for('settings_page'))
 
-        except Exception as e:
-            flash(f"Something went wrong error: {e}", category='warning')
-            return redirect(url_for('holdings_page'))
     else:
-        return redirect(url_for('holdings_page'))
+        return redirect(url_for('settings_page'))

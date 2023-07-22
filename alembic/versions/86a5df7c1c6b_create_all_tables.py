@@ -1,8 +1,8 @@
-"""create all tables
+"""Create all tables
 
-Revision ID: 67c96ba03ce3
+Revision ID: 86a5df7c1c6b
 Revises: 
-Create Date: 2023-04-04 22:40:10.842145
+Create Date: 2023-04-25 17:41:31.032454
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '67c96ba03ce3'
+revision = '86a5df7c1c6b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,14 +22,15 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=100), nullable=True),
     sa.Column('number_of_calls', sa.Integer(), nullable=True),
-    sa.Column('stoploss_target', sa.Integer(), nullable=False),
-    sa.Column('performance', sa.Float(), nullable=False),
+    sa.Column('target_achieved', sa.Integer(), nullable=True),
+    sa.Column('stop_loss_triggered', sa.Integer(), nullable=True),
+    sa.Column('performance', sa.Float(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('list_of_brokers',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=45), nullable=False),
-    sa.Column('type', sa.Boolean(), nullable=True),
+    sa.Column('broker_type', sa.Boolean(), nullable=True, comment='1 for Discount broker and 0 for No Discount Broker'),
     sa.Column('equity_delivery', sa.Float(), nullable=True),
     sa.Column('equity_intraday', sa.Float(), nullable=True),
     sa.Column('transaction_chgs', sa.Float(), nullable=True),
@@ -62,7 +63,7 @@ def upgrade() -> None:
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('name', sa.String(length=45), nullable=False),
     sa.Column('trading_code', sa.String(length=45), nullable=False),
-    sa.Column('type', sa.Boolean(), nullable=True),
+    sa.Column('broker_type', sa.Boolean(), nullable=True, comment='1 for Discount broker and 0 for No Discount Broker'),
     sa.Column('equity_delivery', sa.Float(), nullable=False),
     sa.Column('equity_intraday', sa.Float(), nullable=False),
     sa.Column('transaction_chgs', sa.Float(), nullable=True),
@@ -89,13 +90,13 @@ def upgrade() -> None:
     sa.Column('date', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('script', sa.String(length=50), nullable=True),
     sa.Column('price', sa.Float(), nullable=True),
-    sa.Column('call', sa.String(length=10), nullable=True),
-    sa.Column('stop_loss', sa.Float(), nullable=True),
+    sa.Column('call', sa.String(length=10), nullable=True, comment='Buy/Sell'),
     sa.Column('target', sa.Float(), nullable=True),
-    sa.Column('time_frame', sa.Integer(), nullable=True),
+    sa.Column('stop_loss', sa.Float(), nullable=True),
+    sa.Column('call_validity', sa.Integer(), nullable=True),
     sa.Column('analyst', sa.String(length=50), nullable=True),
-    sa.Column('performance', sa.Float(), nullable=True),
     sa.Column('resource', sa.Text(), nullable=True),
+    sa.Column('tgt_sl', sa.String(length=45), server_default='live', nullable=False, comment='Target/stoploss'),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -103,12 +104,13 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('date', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.Column('type', sa.String(length=10), nullable=False),
-    sa.Column('call', sa.String(length=10), nullable=False),
+    sa.Column('trade_mode', sa.String(length=10), nullable=False, comment='Is it Delivery or Intraday'),
+    sa.Column('call', sa.String(length=10), nullable=False, comment='Buy/Sell'),
     sa.Column('script', sa.String(length=45), nullable=True),
     sa.Column('price', sa.Float(), nullable=False),
     sa.Column('qty', sa.Integer(), nullable=False),
     sa.Column('brokerage_per_unit', sa.Float(), nullable=False),
+    sa.Column('total_brokerage', sa.Float(), nullable=False),
     sa.Column('net_rate_per_unit', sa.Float(), nullable=False),
     sa.Column('net_total_before_levies', sa.Float(), nullable=False),
     sa.Column('transaction_chgs', sa.Float(), nullable=False),

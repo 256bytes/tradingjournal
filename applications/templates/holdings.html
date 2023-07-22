@@ -1,18 +1,43 @@
 {% extends 'layout.html' %}
 {% block title %}Holdings{% endblock title %}
 {% block content %}
-    <div class="row"> <!--div first row starts (export - import)-->
-        
+
+<div class="container">
+<div class="row"> <!--div first row starts (export - import)-->
         <div class="clear-fix col-6">
-            <div class="float-start">
-                <a href="#" class="btn btn-outline-secondary btn-sm mx-2">
-                    {% if net_investment.total_investment != None and net_investment.total_investment > 0 %}
-                        Net Investment: {{ net_investment.total_investment | round | float |numberFormat}}
-                    {% else %}
-                    Net Investment:
-                    {% endif %}</a>
-                <a href="{{ url_for('buy_page') }}" class="btn btn-outline-success btn-sm mx-2">Buy</a>
-            </div>
+            <table  class="table table-light table-bordered table-sm hld_values">
+                <tbody>
+                    <tr>
+                        <td>Net Investment:</td>
+                        {% if net_investment.total_investment != None and net_investment.total_investment > 0 %}
+                        <td class="float-column">{{ format_price(net_investment.total_investment) }}</td>
+                        {% else %}
+                        NA
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <td>Current Value:</td>
+                        {% if net_investment.total_investment != None and net_investment.total_investment > 0 %}
+                        <td class="float-column">{{ format_price(curr_inv_val)}}</td>
+                        {% else %}
+                        NA
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <td>P/L:</td>
+                        {% if net_investment.total_investment != None and net_investment.total_investment > 0 %}
+                        {% set pl = curr_inv_val - net_investment.total_investment %}
+                        <td class="{{ "green" if (pl > 0) == True else "red"}} float-column">{{ format_price(pl)}}</td>
+                        {% else %}
+                        NA 
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <td>Total Scrips</td>
+                        <td>{{total_scrips}}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         <div class="clear-fix col-6">
             <div class="float-end">
@@ -22,31 +47,32 @@
                 </form>
             </div>
         </div>
-
+        
     </div> <!--div first row ends (export - import)-->
+</div>
     
     <div class="table">
-        <table class="table table-light table-striped table-sm" id="my-table">
+        <table class="table table-light table-bordered table-striped table-sm" id="my-table">
             <thead>
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">script</th>
                     <th scope="col">Qty</th>
                     <th scope="col">Avg Cost</th>
-                    <th scope="col">Investment</th>
-                    <th scope="col">Prev Close</th>
-                    <th scope="col">Prev Value</th>
-                    <th scope="col">Profit-Loss</th>
-                    <th scope="col">Buy/Sell</th>
+                    <th>Net Investment</th>
+                    <th>Curr. Price</th>
+                    <th>Curr. Value</th>
+                    <th>Gain/Loss</th>
+                    <th>Buy/Sell</th>
                 </tr>
             </thead>
             <tbody>
-                {% for holding in holdings.items %}
+                {% for holding in holdings %}
                     {% set outer_loop = loop %}
                         {% if outer_loop.index0 == loop.index0 %}
                         {% include 'includes/trade_modal.html' %}
                         {% include 'includes/add_bonus_modal.html' %}
-                                {% if (holding.shares | int) > 0 %}
+                                {% if (holding.net_qty | int) > 0 %}
                                     <tr>
                                         <td></td>
                                         <!--Script-->
@@ -57,35 +83,32 @@
                                         {% endif %}
                                         
                                         <!--Qty-->
-                                        <td>{{ holding.shares }}</td>
+                                        <td class="float-column">{{ holding.net_qty }}</td>
                                         
                                         <!--Avg Cost-->
-                                        {% set avg =  (holding.total_investments | int) / (holding.shares | int) %}
+                                        {% set avg =  (holding.total_investments | int) / (holding.net_qty | int) %}
                                         {% if avg < 0 %}
                                             {% set avg = 0.00 %}
                                         {% endif %}
-                                        <td>{{ format_price(avg | round(2) | float) }}</td>
+                                        <td class="float-column">{{ format_price(holding.avg_cost) }}</td>
 
                                         <!--Investment-->
                                         {% set invested = holding.total_investments %}
                                         {% if invested < 0 %}
                                             {% set invested = 0.00 %}
                                         {% endif %}
-                                        <td>{{ format_price(invested | round(2) | float)}}</td>
+                                        <td class="float-column">{{ format_price(holding.total_investments)}}</td>
 
                                         <!--Last Traded Price-->
-                                        <td>{{ format_price(my_prev_close(holding.script)) }}</td>
-                                        
-                                        <!--Curr. Value-->
-                                        {% set pcp = my_prev_close(holding.script) %}
-                                        <td>{{ format_price((pcp | float ) * (holding.shares)) }}</td>
-                                        
-                                        <!--Profit and Loss-->
-                                        {% set curr_value = (pcp | float ) * (holding.shares) %}
-                                        {% set investment = (holding.total_investments) %}
-                                        {% set result = curr_value - investment %}
-                                        <td class="{{ "green" if (curr_value > investment) == True else "red"}}">{{format_price(result |abs)  }}</td>
-                                        
+                                        <td class="float-column">{{ format_price(holding.current_price)}}</td>
+                                           
+                                        <!--Curr. Value previous close price pcp-->
+                                        {% set pcp = PreviousClose().my_prev_close(holding.script) %}
+                                        <td class="float-column">{{ format_price(holding.current_value) }}</td>
+                                         <!--Profit Loss pl = profit loss-->
+                                        {% set pl = holding.current_value - holding.total_investments %}
+                                        <td class="{{ "green" if (pl > 0) == True else "red"}} float-column">{{format_price(pl |abs)}}</td>
+
                                         <!--Buttons-->
                                         <td>
                                             <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#Modal-Buy-{{ holding.script }}">Buy</button>
@@ -100,23 +123,34 @@
                         {% endif %}
                 {% endfor %}
             </tbody>
-            <footer class="text-center"><sm>Note: Previous Close is on {{ bhavcopy_date() }}*</sm></footer>
+            <footer class="text-center"><sm>{{ bhavcopy_date() }}</sm></footer>
         </table>
+
     </div>
-    
-    <div class="text-center paginated">
-        {% for page_num in holdings.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-            {% if page_num %}
-                {% if holdings.page == page_num %}
-                    <a class="btn btn-secondary mb-4" id="btn-secondary" href="{{ url_for('holdings_page', page=page_num) }}">{{ page_num }}</a>
-                {% else %}
-                    <a class="btn btn-outline-info mb-4" href="{{ url_for('holdings_page', page=page_num) }}">{{ page_num }}</a>
-                {% endif %}
-            {% else %}
-                ...
-            {% endif %}
-        {% endfor %}
-    </div>
+<!-- Pagination links -->
+<div class="pagination justify-content-center">
+    {% if page > 1 %}
+        <a class="btn btn-outline-secondary mb-4" href="{{ url_for('holdings_page', page=page-1) }}">Previous</a>
+    {% endif %}
+    {% for num in calculate_page_range(page, total_pages) %}
+        {% if num == page %}
+            <span class="current-page btn btn-secondary mb-4">{{ num }}</span>
+        {% else %}
+            <a class="btn btn-outline-secondary mb-4" href="{{ url_for('holdings_page', page=num) }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    {% if page < total_pages - 1 %}
+        ...
+        <a class="btn btn-outline-secondary mb-4" href="{{ url_for('holdings_page', page=total_pages) }}">{{ total_pages }}</a>
+    {% endif %}
+    {% if page < total_pages %}
+        <a class="btn btn-outline-secondary mb-4" href="{{ url_for('holdings_page', page=page+1) }}">Next</a>
+    {% endif %}
+</div>
+
+
+
+
 {% endblock %}
 
 
@@ -125,7 +159,7 @@
 Will work in future as this is giving problem with modal(modal gets transparent)-->
 
 <div class="table" hidden>
-    <table class="table table-light table-striped table-sm" id="data">
+    <table class="table table-light table-bordered table-striped table-sm" id="data">
         <thead>
             <tr>
                 <th scope="col">#</th>
@@ -143,7 +177,7 @@ Will work in future as this is giving problem with modal(modal gets transparent)
             {% set outer_loop = loop %}
                 {% if outer_loop.index0 == loop.index0 %}
                     {% include 'includes/trade_modal.html' %}
-                    {% if (holding.shares | int) > 0 %}
+                    {% if (holding.net_qty | int) > 0 %}
                         <tr>
                             <td></td>
                             {% if '_' in holding.script %}
@@ -152,9 +186,9 @@ Will work in future as this is giving problem with modal(modal gets transparent)
                                 <td>{{ holding.script }}</td>
                             {% endif %}
                         
-                            <td>{{ holding.shares }}</td>
+                            <td>{{ holding.net_qty }}</td>
                         
-                            {% set avg =  (holding.total_investments | int) / (holding.shares | int) %}
+                            {% set avg =  (holding.total_investments | int) / (holding.net_qty | int) %}
                             {% if avg < 0 %}
                                 {% set avg = 0.00 %}
                             {% endif %}
@@ -166,12 +200,12 @@ Will work in future as this is giving problem with modal(modal gets transparent)
                         
                             <td>{{ format_price(invested | round(2) | float)}}</td>
                             
-                            <td>{{ my_prev_close(holding.script) }}</td>
-                            {% set ltp = my_prev_close(holding.script) %}
+                            <td>{{ format_price(PreviousClose().my_prev_close(holding.script)) }}</td>
+                            {% set ltp = PreviousClose().my_prev_close(holding.script) %}
                         
-                            <td>{{ format_price((ltp | float ) * (holding.shares)) }}</td>
+                            <td>{{ format_price((ltp | float ) * (holding.net_qty)) }}</td>
                         
-                            {% set curr_value = (ltp | float ) * (holding.shares) %}
+                            {% set curr_value = (ltp | float ) * (holding.net_qty) %}
                             {% set investment = (holding.total_investments) %}
                             {% set result = curr_value - investment %}
                         

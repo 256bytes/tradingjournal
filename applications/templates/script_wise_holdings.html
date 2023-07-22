@@ -1,0 +1,121 @@
+{% extends 'layout.html' %}
+{% block title %}Script Wise Holdings{% endblock title %}
+{% block content %}
+<div class="table">
+    <table class="table table-light table-bordered table-striped table-sm sw_hold">
+        
+        <thead>
+            <tr>
+                <th colspan="2">Script: {{symbol}}</th>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <th>Broker Name</th>
+                <th>Trading Account</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Total Brokerage</th>
+                <th>Total Taxes</th>
+                <th>Net Investment</th>
+                <th>Curr. Price</th>
+                <th>Curr. Value</th>
+                <th>Gain/Loss</th>
+                <th>Buy/Sell</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for holding in holdings %}
+            {% include 'includes/trade_modal.html' %}
+            {% include 'includes/add_bonus_modal.html' %}
+
+            {% if holding.net_qty > 0 %}
+
+                <tr>
+                    <!--Date-->
+                    <td>{{holding.date.strftime('%d/%m/%y')}}</td>
+                    <!--Broker Name-->
+                    <td>{{ holding.broker_name }}</td>
+                    <!--Trading Account-->
+                    <td>{{ holding.trading_code }}</td>
+                    <!--Qty-->
+                    <td>{{ holding.net_qty }}</td>
+                    <!--Price-->
+                    {% set avg = (holding.total_investments | int) / (holding.net_qty | int) %}
+                    {% if avg < 0 %}
+                    {% set avg = 0%}
+                    {% endif %}
+                    <td class="float-column">{{ format_price(holding.avg_cost) }}</td>
+                    <!--Total Brokerage-->
+                    <td class="float-column">{{ holding.total_brokerage }}</td>
+                    <!--Total Taxes-->
+                    <td class="float-column">{{ holding.total_taxes }}</td>
+                    <!--Net Investment-->
+                    {% if avg <= 0 %}
+                    {% set net_investment = 0.01 %}
+                    <td class="float-column">{{ format_price(net_investment) }}</td>
+                    {% else %}
+                    <td class="float-column">{{ format_price(holding.total_investments) }}</td>
+                    {% endif %}
+                    <!--Last traded price previous close price pcp -->
+                    <td class="float-column">{{ format_price(holding.current_price) }}</td>
+                    <!--Curr. Value-->
+                    <td class="float-column">{{ format_price(holding.current_value)}}</td>
+                    <!--Gain/Loss-->
+                    {% if avg <= 0 %}
+                    <td class= " float-column {{'green' if (avg <= 0) == True else 'red'}}">{{format_price(holding.current_value |abs) }}</td>
+                    {% else %}
+                    {% set pl = holding.current_value - holding.total_investments %}
+                    <td class= " float-column {{'green' if (pl > 0) == True else 'red'}}">{{format_price(pl |abs) }}</td>
+                    {% endif %}
+                    <!--Buy/Sell-->
+                    <!--Buttons-->
+                    <td>
+                        <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#Modal-Buy-{{ holding.script }}">Buy</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#Modal-Sell-{{ holding.script }}">Sell</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#Modal-Add-{{ holding.script }}">Add Bonus</button>
+                    </td>
+                </tr>
+                {% else %}
+                <p><b>{{holding.script}}</b> in not in your dp account.</p>
+                {% endif %}
+                {% endfor %}
+        </tbody>
+        <footer class="text-center"><sm>{{ bhavcopy_date() }}</sm></footer>
+    </table>
+</div>
+{% if caller == 'live_calls_page' %}
+<div class="container text-center">
+    <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('live_calls_page', page=current_page) }}">Back</a>
+</div>
+{% elif caller =='analyst_wise_analytics_page' %}
+<div class="container text-center">
+    <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('analyst_wise_analytics_page', page=current_page, analyst=analyst) }}">Back</a>
+</div>
+{% endif %}
+</div>
+
+{% endblock content %}
+
+
+
+{%- macro format_price(price, thousand_separator=',', decimal_separator='.', decimal_places=2) -%}
+{%- set price_as_string = price | string -%}
+{%- set price_split = price_as_string.split('.') -%}
+{%- set price_integer = price_split[0] -%}
+{%- if price_split | count > 1 -%}
+{%- set price_fraction = price_split[1] -%}
+{%- if price_fraction | length < decimal_places -%}
+{%- set price_fraction = price_fraction.ljust(decimal_places, '0') -%} 
+{%- else -%}
+{%- set price_fraction = price_fraction[:decimal_places] -%}
+{%- endif -%}
+{%- else -%}
+{%- set price_fraction = '' -%}
+{%- endif -%}
+{%- set formatted_price_integer = price_integer | reverse | batch(3) | map('join', '') | join(thousand_separator) | reverse -%}
+{%- if price_fraction != '' -%}
+{%- set formatted_price = formatted_price_integer ~ decimal_separator ~ price_fraction -%}
+{%- else -%}
+{%- set formatted_price = formatted_price_integer-%}
+{%- endif -%}
+{{- formatted_price -}} {%- endmacro -%}

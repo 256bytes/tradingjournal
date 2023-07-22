@@ -17,37 +17,16 @@
     <title>{% block title %}{% endblock title %}</title>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-      $(document).ready(function() {
-        $('#export-btn').click(function() {
-          var table = $('#my-table').html();
-          var filename = prompt("Enter file name:");
-          if (filename != null) {
-            $.ajax({
-              url: '/export',
-              type: 'POST',
-              data: {table: table, filename: filename},
-              success: function(data) {
-                window.location.href = '/export';
-              }
-            });
-          }
-        });
-      });
-    </script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script src="{{url_for('static', filename="ac_search.js")}}"></script>
+    
 
-    
-    
   </head>
 
 
   <body>
-    <nav class="navbar navbar-expand-sm navbar-dark">
+    <nav class="navbar sticky-top navbar-expand-sm navbar-dark">
         <div class="container-fluid">
-          <div class="logo">
-            <img class='mb-1' src="{{ url_for('static', filename='images/nav_dark_logo.png') }}" width=50 alt="Website Logo">
-            <h6 class="title">Trading Journal</h6>
-          </div>
          
           <!--<a class="navbar-brand" href="#"> My Trading Journal</a>-->
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,13 +35,34 @@
 
           {% if current_user.is_authenticated %}
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <div class="logo_nav">
+              <img class='mb-1' src="{{ url_for('static', filename='images/nav_dark_logo.png') }}" height=30 width=30 alt="Website Logo">
+              <h6 class="title">{{current_user.username}}'s Trading Journal</h6>
+            </div>
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('home_page') }}">Home</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('holdings_page') }}">Holdings</a>
-              </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false mx-50">
+                    Holdings
+                  </a>
+                  <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="{{ url_for('holdings_page', page=1) }}">Holdings</a></li>
+                    <li>
+                      <form id="acs_symbol_form" action="{{url_for('script_wise_holdings_page', page=1)}}",  method="POST">
+                        {{acs_form.hidden_tag()}}
+                        {{acs_form.symbols(class="form-control")}}
+                      </form>
+                    </li>
+                    <li>
+                      <form id="acs_trading_form" action="{{url_for('broker_wise_holding_page', page=1)}}", method="GET">
+                        {{ acs_form.hidden_tag() }}
+                        {{acs_form.trading_code(class="form-control")}}
+                    </form>
+                    </li>
+                  </ul>
+                </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false mx-50">
                   History
@@ -75,14 +75,40 @@
 
                 </ul>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('notes_page') }}">Notes</a>
+              
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false mx-50">
+                  Analytics
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <li><a class="dropdown-item" href="{{ url_for('analytics_page') }}">Analytics</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('live_calls_page') }}">Live Calls</a></li>
+                  <li>
+                    <form id="acs_symb_research_form" action="{{url_for('script_wise_analytics_page', page=1)}}", method="POST">
+                      {{acs_form.hidden_tag()}}
+                      {{acs_form.research_symbols(class="form-control")}}
+                    </form>
+                  </li>
+                  <li>
+                    <form id="acs_analyst_form" action="/analyst_wise_analytics", method="POST">
+                      {{ acs_form.hidden_tag() }}
+                      {{acs_form.analyst(class="form-control")}}
+                  </form>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false mx-50">
+                  Profit/Loss
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <li><a class="dropdown-item" href="{{ url_for('profit_loss_page') }}">Consolidated</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('pl_script_wise_page', page=1) }}">Script Wise</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('pl_broker_wise_page') }}">Broker Wise</a></li>
+                </ul>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('analytics_page') }}">Analytics</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('profit_loss_page') }}">Profit/Loss</a>
+                <a class="nav-link" href="{{ url_for('buy_page') }}">Buy Stocks</a>
               </li>
             </ul>
             
@@ -104,6 +130,10 @@
               </div>
 
             {% else %}
+            <div class="logo_nav">
+              <img class='mb-1' src="{{ url_for('static', filename='images/nav_dark_logo.png') }}" height=30 width=30 alt="Website Logo">
+              <h6 class="title">Trading Journal</h6>
+            </div>
               <div class="d-flex navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('login_page') }} ">Login</a>
@@ -133,34 +163,24 @@
       <div class="col-4"></div>
     </div>
     
+    <div id="preloader"></div>
     {% block content %}
+
     {% endblock content %}
+    <script>
+      var loader = document.getElementById("preloader");
+  
+      window.addEventListener("load", function(){
+        loader.style.display = "none";
+      })
+    </script>
     {% block content2 %}
     {% endblock content2 %}
     <!-- Custom JavaScript -->
     
-    <script>
-      function export_to_excel(){
-        const data = document.getElementById('data')
-	      const fp = XLSX.utils.table_to_book(data, {sheet: 'sheet1'});
-	      XLSX.write(fp, {
-		    booktype: 'xlsx',
-		    type: 'base64'
-	      });
-	      XLSX.writeFile(fp, '{{ current_user.username }}.xlsx');
-      }
-    </script>
 
-    <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script>
-        $(function(){
-            $('a').each(function(){
-                if ($(this).prop('href') == window.location.href) {
-                    $(this).addClass('active'); $(this).parents('li').addClass('active');
-                }
-            });
-        });
-    </script>
+
+
     <!-- Optional JavaScript; choose one of the two! -->
 
     <!-- Option 1: Bootstrap Bundle with Popper -->

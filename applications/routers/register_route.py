@@ -3,12 +3,15 @@ from flask_login import login_user
 
 #-------------User Packages --------------------#
 from applications import app
-from applications.forms import RegisterForm
-from applications.models import Users
-from applications.database import db
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_page():
+
+    #-------------User Packages --------------------#
+    from applications.forms import RegisterForm
+    from applications.models import Users
+    from applications.database import db
+
     form = RegisterForm()
 
     try:

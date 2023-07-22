@@ -8,27 +8,27 @@
     <div class="col-4 form_bg text-center">  <!--div second column starts-->
 
         <form method="POST" class="form-register mt-2 mb-2"> <!--Form starts-->
-            {{ form.hidden_tag() }}
+            {{ add_broker_form.hidden_tag() }}
       
-            <img class='mb-3' src="{{ url_for('static', filename='images/new_version_logo.png') }}" width=100 alt="Website Logo">
-            <h6 class='h3 mb-3 font-weight-normal'><small>Add your Broker</small></h6>
+            <img class='mb-3' src="{{ url_for('static', filename='images/new_light_logo.png') }}" width=100 alt="Website Logo">
+            <h6 class='h3 mb-3 font-weight-normal'><small>Add Broker</small></h6>
 
             <br>
 
             <div class="form-group">
-                {{ form.name.label(class="form-control-label")}}
-                {{ form.name(class="form-control")}}
+                {{ add_broker_form.name.label(class="form-control-label")}}
+                {{ add_broker_form.name(class="form-control")}}
             </div>
 
             <div class="form-group">
-                {{ form.trading_code.label(class="form-control-label")}}
-                {{ form.trading_code(class="form-control", autocomplete="off", placeholder="Trading Account Number")}}
+                {{ add_broker_form.trading_code.label(class="form-control-label")}}
+                {{ add_broker_form.trading_code(class="form-control", autocomplete="off", placeholder="Trading Account Number")}}
             </div>
 
             <br>
 
             <div class="form-group">
-                {{ form.submit(class="btn btn-sm btn-outline-secondary form-control") }}
+                {{ add_broker_form.submit(class="btn btn-sm btn-outline-secondary form-control") }}
             </div>
 
         </form> <!--Form ends-->

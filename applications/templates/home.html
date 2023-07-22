@@ -14,14 +14,14 @@
 
   <div class="container-sm d-flex"> <!--div container starts-->
 
+    {% if funds %}
     {% for item in brokers %} <!--Outer loop starts (items in brokers) This loop gets the trading code and the name of the broker -->
       {% set outer_loop = loop %} <!-- setting index for outer loop -->
         {% for inv in investments %} <!--second loop starts (inv in investments) This loop gets the user's invested amount with respective brokers-->
           {% if outer_loop.index0 == loop.index0 %} <!-- first if statement starts (outer_loop.index)-->
           {% set inner_loop = loop %} <!-- setting index for inner loop -->
-            {% for fnds in funds %} <!-- third loop starts (fnds in funds ) This loop gets the total funds balance with the broker(payin, payout etc.)-->
-              {% if inner_loop.index0 == loop.index0 %} <!-- second if statement starts (outer_loop.index)-->
-
+          {% for fnds in funds %} <!-- third loop starts (fnds in funds ) This loop gets the total funds balance with the broker(payin, payout etc.)-->
+          {% if inner_loop.index0 == loop.index0 %} <!-- second if statement starts (outer_loop.index)-->
               {% include 'includes/add_funds_modal.html' %}
               {% include 'includes/withdraw_funds_modal.html' %}
 
@@ -47,10 +47,9 @@
                       {% endif %}
                     </div>
                   </li>
-                  
                   <li class="list-group-item">
                     <div class="d-flex">
-                      <h6 class="card-currency">Funds:&#160; </h6>
+                      <h6 class="card-currency">Available Funds:&#160; </h6>
                       <h6 class="card-currency green" >{{ format_price(fnds) }}</h6>
                     </div>
                   </li>
@@ -68,12 +67,64 @@
               </div> <!--div footer ends-->
 
             </div>
-          {% endif %} <!-- second if statement ends (outer_loop.index)-->
-          {% endfor %} <!--third loop ends (inv in investments)-->
-        {% endif %} <!-- first if statement ends (outer_loop.index)-->
-      {% endfor %} <!--second loop ends (inv in investments)-->
-    {% endfor %} <!--Outer loop ends (items in brokers)-->
-  </div> <!--div container ends-->
+            
+            {% endif %} <!-- second if statement ends (outer_loop.index)-->
+            {% endfor %} <!--third loop ends (inv in investments)-->
+            {% endif %} <!-- first if statement ends (outer_loop.index)-->
+            {% endfor %} <!--second loop ends (inv in investments)-->
+            {% endfor %} <!--Outer loop ends (items in brokers)-->
+            {% else %}
+            {% for item in brokers %} <!--Outer loop starts (items in brokers) This loop gets the trading code and the name of the broker -->
+            {% set outer_loop = loop %} <!-- setting index for outer loop -->
+              {% for inv in investments %} <!--second loop starts (inv in investments) This loop gets the user's invested amount with respective brokers-->
+                {% if outer_loop.index0 == loop.index0 %} <!-- first if statement starts (outer_loop.index)-->
+                {% set inner_loop = loop %} <!-- setting index for inner loop -->
+                    {% include 'includes/add_funds_modal.html' %}
+                    {% include 'includes/withdraw_funds_modal.html' %}
+    
+                  <div class="card " style="width: 18rem;">
+                    <div class="card-header">
+                      <div>{{ item.name }}</div> 
+                      <div>Trading Code: &#160; {{ item.trading_code }}</div> 
+                    </div>
+                      <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                          <div class="d-flex">
+                            {% if inv.total == None %}
+                            {% set invested = 0.00 %}
+                              <h6 class="card-text card-currency">Invested Amt:&#160; </h6>
+                              <h6 class="card-currency green" > {{ format_price(invested) }}</h6>
+                            {% elif inv.total < 0 %}
+                            {% set invested = 0.00 %}
+                              <h6 class="card-text card-currency">Invested Amt:&#160; </h6>
+                              <h6 class="card-currency green" > {{ format_price(invested) }}</h6>
+                            {% else %}
+                              <h6 class="card-currency">Invested Amt:&#160; </h6>
+                              <h6 class="card-currency green" > {{ format_price(inv.total) }}</h6>
+                            {% endif %}
+                          </div>
+                        </li>
+                        
+                      </ul>
+      
+                    <div class="card-footer"> <!--div footer starts-->
+                      <div class="d-flex">
+                        <h6 class="card-text me-3" >
+                          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addFunds-{{ item.id }}">Add Funds</button>
+                        </h6>
+                        <h6 class="card-text me-3" >
+                          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#withdrawFunds-{{ item.id }}">Withdraw Funds</button>
+                        </h6>
+                      </div>
+                    </div> <!--div footer ends-->
+      
+                  </div>
+                  
+                  {% endif %} <!-- first if statement ends (outer_loop.index)-->
+                  {% endfor %} <!--second loop ends (inv in investments)-->
+                  {% endfor %} <!--Outer loop ends (items in brokers)-->
+            {% endif %}
+          </div> <!--div container ends-->
 
       
 {% endblock content %}

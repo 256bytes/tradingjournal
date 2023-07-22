@@ -1,129 +1,121 @@
 from flask import flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_required
 
-#-------------User Packages --------------------#
+
 from applications import app
-from applications.forms import BuyForm
-from applications.models import Brokers, Users, Transactions, Funds
-from applications.database import db
-from applications.helpers import lookup, chk_special
-from applications.calc_taxes.get_taxes import CalculateBrokerageAndTaxes
+
+# from applications.form_validators import CheckUserDatabase
 
 
-
-@app.route('/buy', methods=['GET', 'POST'])
+@app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy_page():
+    # -------------User Packages --------------------#
 
-    call = "buy"
+    from applications.forms import BuyForm
+    from applications.models import Brokers
+    from applications.database import db
+
+    call_type = "Buy"
+    trade_mode = "CNC"
     buy_form = BuyForm()
-    
-    # to populate the users trading codes in buy form.
+
+    # to populate the user's trading codes in buy form.----------------------------------------------------------
     db.session.rollback()
     db.session.begin()
-    t_code = db.session.query(Brokers.trading_code).filter(Brokers.user_id == current_user.id) 
-    
+    trading_code = db.session.query(Brokers.trading_code).filter(Brokers.user_id == current_user.id)
+    # -----------------------------------------------------------------------------------------------------------
+
     if request.method == "POST":
-        #--------------------------- Checking input of symbol/stock field ---------------------------------
-        symbol = request.form.get('symbol').upper()
-        script = lookup(symbol)
-        if not symbol:
-            flash("Field cannot be blank", category='danger')
-            return render_template('/home.html', buy_form=buy_form, t_code=t_code)
-        elif not script:
-            flash("Enter a Valid Symbol", category='danger')
-            return render_template('/home.html', buy_form=buy_form, t_code=t_code)
+        from applications.helpers import SymbolLookup, chk_special
 
-        symb = chk_special(symbol)
-        
-        #--------------------------- Checking input of price field ---------------------------------------
-        try:
-            price = float(request.form.get('price'))
-        except Exception as e:
-            flash(f'Invalid input: {e}', category='danger')
-            return render_template('/home.html', buy_form=buy_form, t_code=t_code)
-        if price <= 0:
-            flash("Enter positive value", category='danger')
-            return render_template('/home.html', buy_form=buy_form, t_code=t_code)
-        if not price:
-            flash("Value must be greater than Zero", category='danger')
-        
-        #-------------------------- Checking input of quantity field ---------------------------------------
-        try:
-            share_qty = int(request.form.get('quantity'))
-        except:
-            flash("Quantity must be an Integer", category='danger')
-            return render_template('/home.html', buy_form=buy_form, t_code=t_code)
-        if share_qty <= 0:
-            flash("Quantity must be more than 0", category='danger')
-            return render_template('/home.html', buy_form=buy_form, t_code=t_code)
+        # --------------------------------- Validating the inputs -----------------------------------------------
+        if buy_form.validate_on_submit():
+            symbol = (buy_form.symbol.data).upper()
+            price = buy_form.price.data
+            qty = buy_form.quantity.data
+            trading_code = buy_form.code.data
+            # type = buy_form.type.data
 
-        #------------------------- Checking input of broker's code field -------------------------------------
-        code = request.form.get('code').upper()
-        attempted_code = Brokers.query.filter_by(trading_code=code, user_id=current_user.id).first()
-        if not code:
-            flash("Field cannot be empty.", category='danger')
-            return render_template('/home.html', buy_form=buy_form, t_code=t_code)
-        elif not attempted_code:
-            flash ("Enter a valid trading_code", category='danger')
-            return render_template('/home.html', buy_form=buy_form, t_code=t_code)
+            # ----- Validates stock symbol ----------------------------
+            validate_stock_symbol = SymbolLookup().find_symbol(symbol)
 
-        #-------------------------- to get the broker's name ---------------------------------------------------
-        data = db.session.query(Brokers.name).filter(Brokers.trading_code == code).first() 
-        attempted_user = Users.query.filter_by(id=current_user.id).first()
+            if validate_stock_symbol:
+                from applications.user_database import GetUserData
 
-        if not attempted_user:
-            flash ("Invalid User or something went wrong!", category='danger')
-            return render_template('/home.html', buy_form=buy_form, t_code=t_code)
+                data = GetUserData(
+                    route="/buy",
+                    user_id=current_user.id,
+                    trading_code=trading_code,
+                    trade_mode=trade_mode,
+                    symbol=symbol,
+                    call_type=call_type,
+                    price=price,
+                    qty=qty,
+                )
+                
+                # ------- Logic to get brokerage and taxes----------
+                result, message = data.brokerage_and_taxes()
+                if not result:
+                    flash(message, category="danger")
+                    return redirect(url_for("holdings_page", page=1))
 
-        try:
-            result = CalculateBrokerageAndTaxes(code, current_user.id, price, share_qty, call)
-        except Exception as e:
-                flash(f"Something went wrong while calculating brokerage and taxes. error: {e}", category='warning')
-                return redirect(url_for('holdings_page'))
+                else:
+                    # -----Logic to get the balance from the funds table--------
+                    result, fund_bal = data.get_balance()
+                    if not result:
+                        flash(message, category="danger")
+                        return render_template("/holdings.html", buy_form=buy_form, trading_code=trading_code)
 
-        #-------------------------- Updating Funds table ---------------------------------------------------
-        try:
-            db.session.rollback()
-            db.session.begin()
-            update_funds = Funds(user_id = current_user.id,
-                                trading_code = code,
-                                debits = result.r_payable)
-            db.session.add(update_funds)
-            db.session.commit()
-        except Exception as e:
-            flash(f"Something went wrong while inserting the data to the funds table. error: {e}", category='warning')
-            return redirect(url_for('buy_page'))
+                    else:
+                        # ------Logic to add the buy details to transactions table----------
+                        result, message = data.add_transactions()
+                        if not result:
+                            flash(message, category="danger")
+                            return redirect(url_for("holdings_page", page=1))
 
-        try:
-            db.session.rollback()
-            db.session.begin()
-            script_to_add = Transactions(user_id = current_user.id,
-                            type = "CNC",
-                            call = 'Buy',
-                            script = symb,
-                            price = buy_form.price.data,
-                            qty = buy_form.quantity.data,
-                            brokerage_per_unit = result.r_b,
-                            net_rate_per_unit = result.r_rpu,
-                            net_total_before_levies = result.r_net_before_tax,
-                            transaction_chgs = result.r_tchgs,
-                            dp_chgs = result.r_dp_chgs,
-                            stt = result.r_stt,
-                            sebi_turnover_fees = result.r_turn_over,
-                            stamp_duty = result.r_sd,
-                            gst = result.r_gst,
-                            total_taxes = result.r_total_taxes_others,
-                            net_total = result.r_payable,
-                            broker = data[0], # square braket to extract the data from the tupple
-                            trading_code = code
-                            )
-            db.session.add(script_to_add)
-            db.session.commit()
-            flash("Script successfully added!", category='success')
-            return redirect(url_for('holdings_page'))
-        except Exception as e:
-            flash(f"Something went wrong while inserting the data to the transaction table. error: {e}", category='warning')
-            return redirect(url_for('buy_page'))
+                        else:
+                            # -----Logic to update the funds table---------
+                            result, message = data.update_funds()
+                            if not result:
+                                flash(message, category="danger")
+                                return redirect(url_for("holdings_page", page=1))
+
+                            else:
+                                # ------ Logic to update the balance in funds table---------
+
+                                result, message = data.update_balance(fund_bal)
+                                if not result:
+                                    flash(message, category="danger")
+                                    return render_template(
+                                        "/holdings.html", buy_form=buy_form, trading_code=trading_code
+                                    )
+
+                                else:
+                                    flash(message, category="success")
+                                    return redirect(url_for("holdings_page", page=1))
+            else:
+                flash("Invalid stock symbol. Check your symbol and try again", category="danger")
+                return render_template("/buy.html", buy_form=buy_form, trading_code=trading_code)
+
+        else:
+            if "code" in buy_form.errors:
+                # print()
+                # print("Yes code error")
+                # print()
+                x = request.form.get("code")
+                # print()
+                # print(x)
+                # print()
+            else:
+                # print()
+                x = request.form.get("code")
+                # print(x)
+                # print(buy_form.code.data)
+                # print()
+
+            flash("Something went wrong with validation! Check all the inputs and try again", category="danger")
+            return render_template("/buy.html", buy_form=buy_form, trading_code=trading_code)
+
     else:
-        return render_template('/buy.html', buy_form=buy_form, t_code=t_code)
+        return render_template("/buy.html", buy_form=buy_form, trading_code=trading_code)

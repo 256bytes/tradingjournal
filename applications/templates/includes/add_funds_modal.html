@@ -18,8 +18,8 @@ tabindex="-1" aria-labelledby="addFunds" aria-hidden="true"> <!--div modal fade 
     <label class="col-form-label">Tradnig Code: {{ item.trading_code }}</label>
 </div>
 
-<input type="hidden" class="form-control" name="trader_name" value="{{ item.name}}" required="True">
-<input type="hidden" class="form-control" name="trader_code" value="{{ item.trading_code}}" required="True">
+{{ add_funds_form.name(type="hidden", class="form-control", value=item.name, required="True") }}
+{{ add_funds_form.trading_code(type="hidden", class="form-control", value=item.trading_code, required="True") }}
 <div class="mb-3">
     {{ add_funds_form.add_funds(class="form-control", autocomplete="off", placeholder="Enter the Amount to add") }}
 </div>

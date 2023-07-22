@@ -6,7 +6,7 @@ from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 
 from applications import app
-from applications.config import settings
+# from applications.config import settings
 
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:8thNov2022@localhost/trading_journal'

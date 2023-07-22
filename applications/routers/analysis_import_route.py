@@ -3,20 +3,24 @@ from flask_login import current_user, login_required
 from openpyxl import load_workbook
 import os
 
-#-------------User Packages --------------------#
+
 from applications import app
-from applications.models import Analysts, Research
-from applications.database import db
-from applications.helpers import lookup
 
 @app.route('/analysis_import', methods=["GET","POST"])
 @login_required
 def import_analysis_form():
 
+    #-------------User Packages --------------------#
+    
+    from applications.models import Analysts, Research
+    from applications.database import db
+    
     if not request.files['File']:
         flash("Select the file to import", category='warning')
         return redirect(url_for('analytics_page'))
     try:
+        
+        
         f = request.files['File']
         f.save(f.filename)
         fname = f.filename
@@ -27,7 +31,8 @@ def import_analysis_form():
     except Exception as e:
         flash(f"Something went wrong while importing the file. error: {e}", category='warning')
         return redirect(url_for('analytics_page'))
-
+    
+    from applications.helpers import SymbolLookup
     for row in range(2, sheet.max_row + 1):
         if sheet.cell(row, 1).value:
 
@@ -39,7 +44,7 @@ def import_analysis_form():
             tmf = sheet.cell(row, 6).value
             analyst = sheet.cell(row, 7).value
             resource = sheet.cell(row, 8).value
-            chk_script = lookup(script)
+            chk_script = SymbolLookup().find_symbol(script)
             call = call.upper()
             
             if not chk_script:
@@ -71,7 +76,7 @@ def import_analysis_form():
                                     call = call,
                                     stop_loss = sl,
                                     target = tgt,
-                                    time_frame = tmf,
+                                    call_validity = tmf,
                                     analyst = analyst,
                                     resource = resource)
             db.session.add(add_research)

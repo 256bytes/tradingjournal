@@ -2,6 +2,7 @@
 {% block title %}Profit_loss{% endblock title %}
 
 {% block content %}
+
 <div> <!--div block starts-->
     <table class="table table-light table-striped table-sm table-sm">
         <thead>
@@ -31,40 +32,56 @@
             {% set ni = 0 %}
             <tr>
                 <td></td>
+                <!--Date-->
                 <td>{{ pl.date.strftime('%d/%m/%y') }}</td>
+
+                <!--Trading Code-->
                 <td>{{ pl.trading_code }} </td>
+
+                <!--Script-->
                 {% if '_' in pl.script %}
                      <td>{{ pl.script | replace('_', '&') }}</td>
                 {% else %}
                     <td>{{ pl.script }}</td>
                 {% endif %}
+
+                <!--Quantity-->
                 <td>{{ pl.qty }}</td>
+
+                <!--Average Price-->
                 {% if pl.qty > 0 %}
                 <td>{{ format_price(pl.net_rate_per_unit ) }}</td>
                 {% else %}
                 <td></td>
                 {% endif %}
                 
+                <!--Net Invested-->
                 {% if pl.qty > 0 %}
                 <td>{{ format_price(pl.net_total) }}</td>
                 {% else %}
                 <td></td>
                 {% endif %}
+
+                <!--Total Taxes-->
                 <td>{{ format_price(pl.total_taxes) }}</td>
                 <td></td>
-         
+                
+                <!--Avg Sell Price-->
                 {% if pl.qty < 0 %}
                     <td>{{ format_price(pl.net_rate_per_unit |abs) }}</td>
                 {% else %}
                     <td></td>
                 {% endif %}
+
+                <!--Net Recieveable-->
                 {% if pl.qty < 0 %}
                     <td>{{ format_price(pl.net_total |abs) }}</td>
                 {% else %}
                     <td></td>
                 {% endif %}
-                
+
             </tr>
+
             {% endif %}
             {% endfor %}
             {% endfor %}
@@ -81,6 +98,8 @@
                     {% set recievable = (bottom_line_ss.net_recievable |abs) %}
                 {% endif %}
                 <td>{{ format_price (recievable) }}</td>
+                
+
                 
                 
             

@@ -1,0 +1,167 @@
+{% extends 'layout.html' %}
+{% block title %}Broker Wise Holdings{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row"> <!--div first row starts (export - import)-->
+            <div class="clear-fix col-6">
+                <table  class="table table-light table-bordered table-sm hld_values">
+                    <tbody>
+                        <tr>
+                            <td>Net Investment:</td>
+                            {% if net_investment.total_investment != None and net_investment.total_investment > 0 %}
+                            <td class="float-column">{{ format_price(net_investment.total_investment) }}</td>
+                            {% else %}
+                            NA
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Current Value:</td>
+                            {% if net_investment.total_investment != None and net_investment.total_investment > 0 %}
+                            <td class="float-column">{{ format_price(curr_inv_val)}}</td>
+                            {% else %}
+                            NA
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>P/L:</td>
+                            {% if net_investment.total_investment != None and net_investment.total_investment > 0 %}
+                            {% set pl = curr_inv_val - net_investment.total_investment %}
+                            <td class="{{ "green" if (pl > 0) == True else "red"}} float-column">{{ format_price(pl)}}</td>
+                            {% else %}
+                            NA 
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Total Scrips</td>
+                            <td>{{total_scrips}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div> <!--div first row ends (export - import)-->
+    </div>
+    <div class="row">
+        <div class="table">
+    
+        <table class="table table-light table-bordered table-striped table-sm bw_hold">
+            <thead>
+                <tr>
+                    <th colspan="2">Broker: {{broker_name.broker}}</th>
+                    <th colspan="2">Trading Code: {{trading_code}}</th>
+                </tr>
+                <tr>
+                    <th>Date</th>
+                    <th>Script</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Total Brokerage</th>
+                    <th>Total Taxes</th>
+                    <th>Net Investment</th>
+                    <th>Current Price</th>
+                    <th>Current Value</th>
+                    <th>Gain/Loss</th>
+                    <th>Buy/Sell</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for holding in holdings %}
+                {% include 'includes/trade_modal.html' %}
+                {% include 'includes/add_bonus_modal.html' %}
+
+                {% if holding.net_qty > 0 %}
+                <tr>
+                    <td>{{holding.date.strftime('%d/%m/%y') }}</td>
+                    <!--Script-->
+                    <td>{{ holding.script }}</td>
+
+                    <!--Qty-->
+                    <td>{{ holding.net_qty }}</td>
+                    <!--Avg Cost-->
+                    {% if holding.avg_cost < 0 %}
+                        {% set avg_cost = 0.01 %}
+                    {% endif %}
+                    <td class="float-column">{{ format_price(holding.avg_cost) }}</td>
+                    <!--Total Brokerage-->
+                    <td class="float-column">{{ format_price(holding.total_brokerage) }}</td>
+                    <!--Total Taxes-->
+                    <td class="float-column">{{ format_price(holding.total_taxes) }}</td>
+                    <!--Net Investment-->
+                    <td class="float-column">{{ format_price(holding.total_investments) }}</td>
+                    <!--Last Traded Price previous close price pcp-->
+                    <td class="float-column">{{format_price(holding.current_price) }}</td>
+                    
+                    <!--Curr. Value cr_value = current value-->
+                    <td class="float-column">{{format_price(holding.current_value) }}</td>
+
+                    <!--Profit Loss pl = profit loss-->
+                    {% set pl = holding.current_value - holding.total_investments %}
+                    <td class="{{ "green" if (pl > 0) == True else "red"}} float-column">{{format_price(pl |abs)}}</td>
+
+                    <!--Buy/Sell-->
+                    <!--Buttons-->
+                    <td>
+                        <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#Modal-Buy-{{ holding.script }}">Buy</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#Modal-Sell-{{ holding.script }}">Sell</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#Modal-Add-{{ holding.script }}">Add Bonus</button>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+            <footer class="text-center"><sm>{{ bhavcopy_date() }}</sm></footer>
+        </table>
+</div>
+
+<!-- Pagination links -->
+<div class="pagination justify-content-center">
+    {% if page > 1 %}
+        <a class="btn btn-outline-secondary mb-4" href="{{ url_for('broker_wise_holding_page', page=page-1, trading_code=trading_code) }}">Previous</a>
+    {% endif %}
+    {% for num in calculate_page_range(page, total_pages) %}
+        {% if num == page %}
+            <span class="current-page btn btn-secondary mb-4">{{ num }}</span>
+        {% else %}
+            <a class="btn btn-outline-secondary mb-4" href="{{ url_for('broker_wise_holding_page', page=num, trading_code=trading_code) }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    {% if page < total_pages - 1 %}
+        ...
+        <a class="btn btn-outline-secondary mb-4" href="{{ url_for('broker_wise_holding_page', page=total_pages) }}">{{ total_pages }}</a>
+    {% endif %}
+    {% if page < total_pages %}
+        <a class="btn btn-outline-secondary mb-4" href="{{ url_for('broker_wise_holding_page', page=page+1, trading_code=trading_code) }}">Next</a>
+    {% endif %}
+</div>
+
+</div>
+
+</div>
+{% endblock content %}
+
+
+
+{%- macro format_price(price, thousand_separator=',', decimal_separator='.', decimal_places=2) -%}
+{%- set price_as_string = price | string -%}
+{%- set price_split = price_as_string.split('.') -%}
+{%- set price_integer = price_split[0] -%}
+{%- if price_split | count > 1 -%}
+{%- set price_fraction = price_split[1] -%}
+{%- if price_fraction | length < decimal_places -%}
+{%- set price_fraction = price_fraction.ljust(decimal_places, '0') -%} 
+{%- else -%}
+{%- set price_fraction = price_fraction[:decimal_places] -%}
+{%- endif -%}
+{%- else -%}
+{%- set price_fraction = '' -%}
+{%- endif -%}
+{%- set formatted_price_integer = price_integer | reverse | batch(3) | map('join', '') | join(thousand_separator) | reverse -%}
+{%- if price_fraction != '' -%}
+{%- set formatted_price = formatted_price_integer ~ decimal_separator ~ price_fraction -%}
+{%- else -%}
+{%- set formatted_price = formatted_price_integer-%}
+{%- endif -%}
+{{- formatted_price -}} {%- endmacro -%}
+
+
+
+

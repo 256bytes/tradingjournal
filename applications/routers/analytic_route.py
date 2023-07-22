@@ -1,121 +1,141 @@
-from flask import flash, render_template, request, redirect, url_for
+from flask import flash, render_template, request
 from flask_login import current_user, login_required
 from sqlalchemy import func
-
-
-#-------------User Packages --------------------#
 from applications import app
-from applications.forms import ResearchForms
-from applications.models import Transactions, Research, Analysts
-from applications.database import db
-from applications.helpers import lookup
-
+import bleach
 
 @app.route('/analytics', methods=['GET', 'POST'])
 @login_required
 def analytics_page():
 
+    #-------------User Packages --------------------#
+    from applications.forms import ResearchForms, StoplossTarget, AutoCompleteSearchForm
+    from applications.models import Transactions
+    from applications.database import db
+    from applications.user_database import GetUserData
+    
+    from applications.user_database import chk_research_table
+
+    chk_research_table(current_user.id)
+
     my_research_forms = ResearchForms()
+    stoploss_target_forms = StoplossTarget()
+    acs_form = AutoCompleteSearchForm()
 
-    # Pagination logic
-    page = request.args.get('page', 1, int)
-    analysis = Research.query.filter(Research.user_id == current_user.id).order_by(Research.date.desc()).paginate(page=page, per_page=5)
-
-    # to chk whether the said script is held by the user or not. if yes then reflect it in the page.
-    chk_holdings = []
-    for i in analysis:
-        quantity = db.session.query(func.sum(Transactions.qty).label('holding')).filter(Transactions.user_id == current_user.id, Transactions.script == i.script).first()
-        chk_holdings.append(quantity)
+    data = GetUserData(user_id = current_user.id)
+    total_calls, total_open, total_live, total_closed = data.get_call_data()
+    result, message, ad, holdings = data.get_all_research_data()
+    if not result:
+        flash(message, category='danger')
+        return render_template('home.html')
+    else:
+        research = message
 
     if request.method == "POST":
-        symbol = request.form.get('script').upper()
-        script = lookup(symbol)
-        if not script:
-            flash('Invalid symbol', category="warning")
-            return render_template('analytics.html', my_research_forms=my_research_forms, analysis=analysis)
-        
-        price = request.form.get('price')
-        if int(price) < 0:
-            flash('Price cannot be in negative', category="warning")
-            return render_template('analytics.html', my_research_forms=my_research_forms, analysis=analysis)
-        call = request.form.get('call').upper()
-        sl = request.form.get('stop_loss')
-        if int(sl) < 0:
-            flash('Stop Loss cannot be in negative', category="warning")
-            return render_template('analytics.html', my_research_forms=my_research_forms, analysis=analysis)
-        target = request.form.get('target')
-        if int(target) < 0:
-            flash('Target cannot be in negative', category="warning")
-            return render_template('analytics.html', my_research_forms=my_research_forms, analysis=analysis)
-        tf = request.form.get('time_frame')
-        if int(tf) < 0:
-            flash('Time Frame cannot be in negative', category="warning")
-            return render_template('analytics.html', my_research_forms=my_research_forms, analysis=analysis)
+        from applications.helpers import SymbolLookup
 
-        # The input from the user is saved in analysts and research table
-        #------------------ Logic to save the analyst related data to analyst table ----------------------#
-        analyst = request.form.get('analyst')
-        db.session.rollback()
-        db.session.begin()
-        get_analyst = Analysts.query.filter(Analysts.name == analyst).first()
+        # --------------------------------- Validating the inputs -----------------------------------------------
+        if my_research_forms.validate_on_submit():
+            symbol = my_research_forms.script.data.upper()
+            price = my_research_forms.price.data
+            call_type = my_research_forms.call.data.capitalize()
+            stop_loss = my_research_forms.stop_loss.data
+            target = my_research_forms.target.data
+            call_validity = my_research_forms.call_validity.data
+            analyst = my_research_forms.analyst.data.capitalize()
+            resource = my_research_forms.resource.data
+            tgt_sl = my_research_forms.tgt_sl.data
 
-        
-        if not (get_analyst):
-            db.session.rollback()
-            db.session.begin()
-            get_analyst = Analysts.query.filter(Analysts.name == analyst).first()
+            # ----- Validates stock symbol ----------------------------
+            validate_stock_symbol = SymbolLookup().find_symbol(symbol)
 
+            if validate_stock_symbol:
+                
+                data = GetUserData(route='/analytics',user_id=current_user.id, symbol=symbol, call_type=call_type, price=price)
+                
+                result, message = data.update_research(stop_loss, target, call_validity, analyst, resource,)
+                if not result:
+                    flash(message, category='danger')
+                    return render_template('analytics.html',
+                                           acs_form=acs_form,
+                                            tgt_sl=tgt_sl,
+                                            my_research_forms=my_research_forms,
+                                            research=research,
+                                            holdings=holdings,
+                                            stoploss_target_forms=stoploss_target_forms,
+                                            total_calls=total_calls,
+                                                total_open=total_open,
+                                                total_live=total_live,
+                                                total_closed=total_closed
+                                        )
+                
+                else:
+                    result, message = data.update_analyst(analyst=analyst)
+                    if not result:
+                        flash(message, category='danger')
+                        return render_template('analytics.html',
+                                               acs_form=acs_form,
+                                                tgt_sl=tgt_sl,
+                                                my_research_forms=my_research_forms,
+                                                research=research,
+                                                holdings=holdings,
+                                                stoploss_target_forms=stoploss_target_forms,
+                                                total_calls=total_calls,
+                                                    total_open=total_open,
+                                                    total_live=total_live,
+                                                    total_closed=total_closed
+                                            )
+                    else:
+                        flash(message, category='success')
+                        return render_template('analytics.html',
+                                               acs_form=acs_form,
+                                                tgt_sl=tgt_sl,
+                                                my_research_forms=my_research_forms,
+                                                research=research,
+                                                holdings=holdings,
+                                                stoploss_target_forms=stoploss_target_forms,
+                                                total_calls=total_calls,
+                                                    total_open=total_open,
+                                                    total_live=total_live,
+                                                    total_closed=total_closed
+                                                )
         
-        if not (get_analyst):
-            db.session.rollback()
-            db.session.begin()
-            add_analyst = Analysts(name = analyst,
-                                number_of_calls = 1
+            else:
+                return render_template('analytics.html',
+                                    acs_form=acs_form,
+                                    tgt_sl=tgt_sl,
+                                    my_research_forms=my_research_forms,
+                                    research=research,
+                                    holdings=holdings,
+                                    stoploss_target_forms=stoploss_target_forms,
+                                    total_calls=total_calls,
+                                        total_open=total_open,
+                                        total_live=total_live,
+                                        total_closed=total_closed
                                 )
-            db.session.add(add_analyst)
-            db.session.commit()
         else:
-            db.session.rollback()
-            db.session.begin()
-            get_calls = db.session.query(Analysts.number_of_calls).filter(Analysts.name == analyst).first()
-            get_analyst.number_of_calls = get_calls.number_of_calls +1
-
-            db.session.add(get_analyst)
-            db.session.commit()
-
-            db.session.rollback()
-            db.session.begin()
-            add_analyst = Analysts(name = analyst,
-                                number_of_calls = 1
-                                )
-            db.session.add(add_analyst)
-            db.session.commit()
-        #------------------ Logic to save the analyst related data to analyst table ends----------------------#
-
-        #------------------ Logic to save the data to research table ----------------------#
-        resource = request.form.get('resource')
-
-        db.session.rollback()
-        db.session.begin()
-        add_research = Research (user_id = current_user.id,
-                                script = symbol,
-                                price = price,
-                                call = call,
-                                stop_loss = sl,
-                                target = target,
-                                time_frame = tf,
-                                analyst = analyst,
-                                resource = resource)
-        db.session.add(add_research)
-        db.session.commit()
-        flash("Successfully added data to research table", category="success")
-        return redirect(url_for('analytics_page'))
-        
-    return render_template('analytics.html', my_research_forms=my_research_forms, analysis=analysis, chk_holdings=chk_holdings)
-
-
-# @app.route('/add_your_research', methods=['GET', 'POST'])
-# def add_your_research_page():
-#     my_research_forms = ResearchForms()
-    
-    # return render_template('add_your_research.html', my_research_forms=my_research_forms)
+            return render_template('analytics.html',
+                                   acs_form=acs_form,
+                                #    tgt_sl=tgt_sl,
+                                   my_research_forms=my_research_forms,
+                                   research=research,
+                                   holdings=holdings,
+                                   stoploss_target_forms=stoploss_target_forms,
+                                   total_calls=total_calls,
+                                    total_open=total_open,
+                                    total_live=total_live,
+                                    total_closed=total_closed
+                               )
+    else:
+        return render_template('analytics.html',
+                               acs_form=acs_form, 
+                               ad=ad, 
+                               my_research_forms=my_research_forms, 
+                               research=research, 
+                               holdings=holdings, 
+                               stoploss_target_forms=stoploss_target_forms,
+                               total_calls=total_calls,
+                               total_open=total_open,
+                               total_live=total_live,
+                               total_closed=total_closed
+                               )

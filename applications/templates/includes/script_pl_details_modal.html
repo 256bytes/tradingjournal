@@ -1,0 +1,20 @@
+
+<!-- Add Funds Modal -->
+<div class="modal fade" id="Modal-script_details-{{ data.script }}" tabindex="-1" aria-labelledby="Modal-script_details-{{ data.script }}" aria-hidden="true"> <!--div modal fade starts-->
+<div class="modal-dialog"> <!--div modal-dialog starts-->
+<div class="modal-content"> <!--div modal-content starts-->
+<div class="modal-header"> <!--div modal-header starts-->
+</div> <!--div modal-header ends-->
+<div class="modal-body">
+  {{ data }}
+
+{% endfor %}
+
+</div> <!--div modal-body ends-->
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-primary">Save changes</button>
+  </div>
+</div> <!--div modal-content ends-->
+</div> <!--div modal-dialog ends-->
+</div> <!--div modal fade ends-->

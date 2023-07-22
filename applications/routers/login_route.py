@@ -4,13 +4,15 @@ from flask_login import login_user
 
 #-------------User Packages --------------------#
 from applications import app
-from applications.forms import LoginFrom
-from applications.models import Users
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
     
+    #-------------User Packages --------------------#
+    from applications.forms import LoginFrom
+    from applications.models import Users
+
     form = LoginFrom()
     if form.validate_on_submit():
 

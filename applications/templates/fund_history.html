@@ -13,6 +13,7 @@
                         <th scope="col">Pay Out</th>
                         <th scope="col">Debits</th>
                         <th scope="col">Credits</th>
+                        <th scope="col">Cr./Db Bal</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -24,6 +25,7 @@
                             <td>{{ format_price (fd.pay_out) }}</td>
                             <td>{{ format_price (fd.debits )}}</td>
                             <td>{{ format_price (fd.credits) }}</td>
+                            <td>{{ format_price (fd.balance) }}</td>
                         </tr>
                         {% endfor %}
                 </tbody>

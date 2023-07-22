@@ -2,4 +2,6 @@ __pycache__
 venv/
 .env
 TODO.txt
-bhav_copy.csv
+dowloadbhavcopy.txt
+temp_backup_codes.txt
+Imp_resources.txt

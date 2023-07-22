@@ -12,6 +12,7 @@
                 <th>Qty</th>
                 <th>Sell Price</th>
                 <th>Brokerage Per Unit</th>
+                <th>Total Brokerage</th>
                 <th>Net Rate Per Unit</th>
                 <th>Net Total (before levies)</th>
                 <th>Total Taxes</th>
@@ -31,6 +32,7 @@
                     <td>{{ ss.qty |abs }}</td>
                     <td>{{ format_price(ss.price)}}</td>
                     <td>{{ format_price(ss.brokerage_per_unit) }}</td>
+                    <td>{{ format_price(ss.total_brokerage) }}</td>
                     <td>{{ format_price(ss.net_rate_per_unit)}}</td>
                     <td>{{ format_price(ss.net_total_before_levies) }}</td>
                     <td>{{ format_price(ss.total_taxes) }}</td>

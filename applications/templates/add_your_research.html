@@ -1,48 +1,50 @@
-{% extends 'layout.html' %}
-{% block title %}{% endblock title %}
+{% extends 'layout.html' %} {% block title %}Add Research{% endblock title %} {% block
+content %}
+<div class="row">
+  <!--div row starts-->
+  <div class="col-4"><!--div first col starts--></div>
+  <!--div first col ends-->
 
-{% block content %}
-<div class="row"> <!--div row starts-->
-    <div class="col-4"> <!--div first col starts--></div> <!--div first col ends-->
+  <div class="col-4">
+    <!--div second col starts-->
 
-    <div class="col-4"> <!--div second col starts-->
+    <form method="POST" class="form_bg mt-2, mb-2">
+      <!--Form starts-->
+      {{ my_research_forms.hidden_tag() }}
+      <h6 class="h3 mb-3 font-weight-normal text-center">
+        <small>Enter your research</small>
+      </h6>
 
-        <form method="POST" class='form_bg mt-2, mb-2'> <!--Form starts-->
-            {{ my_research_forms.hidden_tag() }}
-            <h6 class="h3 mb-3 font-weight-normal text-center"><small>Enter your analysis</small></h6>
+      <hr />
 
-            <hr>
+      {{ my_research_forms.script.label() }} {{
+      my_research_forms.script(class="form-control", autocomplete="off",
+      placeholder="Script/Symbol") }} {{ my_research_forms.price.label() }} {{
+      my_research_forms.price(class="form-control", autocomplete="off",
+      placeholder="Price") }} {{ my_research_forms.call.label() }} {{
+      my_research_forms.call(class="form-control", autocomplete="off",
+      placeholder="Buy/Sell") }} {{ my_research_forms.stop_loss.label() }} {{
+      my_research_forms.stop_loss(class="form-control", autocomplete="off",
+      placeholder="Enter Stop Loss") }} {{ my_research_forms.target.label() }}
+      {{ my_research_forms.target(class="form-control", autocomplete="off",
+      placeholder="Enter Target") }} {{ my_research_forms.analyst.label() }} {{
+      my_research_forms.analyst(class="form-control", autocomplete="off",
+      placeholder="Enter Analyst Name") }} {{
+      my_research_forms.narration.label() }} {{
+      my_research_forms.narration(class="form-control", autocomplete="off",
+      maxlength=1500, placeholder="Narration") }}
 
-            {{ my_research_forms.script.label() }}
-            {{ my_research_forms.script(class="form-control", autocomplete="off", placeholder="Script/Symbol") }}
+      <hr />
 
-            {{ my_research_forms.price.label() }}
-            {{ my_research_forms.price(class="form-control", autocomplete="off", placeholder="Price") }}
-
-            {{ my_research_forms.call.label() }}
-            {{ my_research_forms.call(class="form-control", autocomplete="off", placeholder="Buy/Sell") }}
-
-            {{ my_research_forms.stop_loss.label() }}
-            {{ my_research_forms.stop_loss(class="form-control", autocomplete="off", placeholder="Enter Stop Loss") }}
-
-            {{ my_research_forms.target.label() }}
-            {{ my_research_forms.target(class="form-control", autocomplete="off", placeholder="Enter Target") }}
-
-            {{ my_research_forms.analyst.label() }}
-            {{ my_research_forms.analyst(class="form-control", autocomplete="off", placeholder="Enter Analyst Name") }}
-
-            {{ my_research_forms.narration.label() }}
-            {{ my_research_forms.narration(class="form-control", autocomplete="off", maxlength=1500, placeholder="Narration") }}
-
-            <hr>
-
-            <div class="mb-3 text-center">
-                {{ my_research_forms.submit(class="btn btn-sm btn-outline-primary")}}
-            </div>
-
-        </form> <!--Form ends-->
-
-    </div> <!--div second col ends-->
-    <div class="col-4"><!--div third col starts--></div> <!--div third col ends-->
-</div> <!--div row ends-->
+      <div class="mb-3 text-center">
+        {{ my_research_forms.submit(class="btn btn-sm btn-outline-primary")}}
+      </div>
+    </form>
+    <!--Form ends-->
+  </div>
+  <!--div second col ends-->
+  <div class="col-4"><!--div third col starts--></div>
+  <!--div third col ends-->
+</div>
+<!--div row ends-->
 {% endblock content %}

@@ -3,7 +3,7 @@
 {% block content %}
 <div class="table"> <!--div table starts-->
     <div class='text-center mb-3'><h3>Buy History Table</h3></div>
-    <table class="table table-light table-striped table-sm tableFixHead">
+    <table class="table table-light table-striped table-sm">
         <thead>
             <tr>
                 <th>Date</th>
@@ -12,6 +12,7 @@
                 <th>Qty</th>
                 <th>Buy Price</th>
                 <th>Brokerage Per Unit</th>
+                <th>Total Brokerage</th>
                 <th>Net Rate Per Unit</th>
                 <th>Net Total (before levies)</th>
                 <th>Total Taxes</th>
@@ -31,6 +32,7 @@
                     <td>{{ sb.qty }}</td>
                     <td>{{ format_price(sb.price )}}</td>
                     <td>{{ format_price(sb.brokerage_per_unit) }}</td>
+                    <td>{{ format_price(sb.total_brokerage) }}</td>
                     <td>{{ format_price(sb.net_rate_per_unit)}}</td>
                     <td>{{ format_price(sb.net_total_before_levies)}}</td>
                     <td>{{ format_price(sb.total_taxes) }}</td>

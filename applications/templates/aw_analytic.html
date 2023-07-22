@@ -1,0 +1,208 @@
+{% extends 'layout.html' %}
+{% block title %}{{analysts}}'s Analysis{% endblock title %}
+{% block content %}
+
+<div class="container text-center">
+  {% set analyst = "" %}
+    {% include 'includes/research_form_modal.html' %}
+    <div class="row">
+      <div class="col-3"></div>
+      <div class="clear-fix col-6">
+        <table class="table table-bordered table-sm text-center" style="width: 100%">
+          <colgroup>
+            <col span="1" style="width: 12%;">
+            <col span="1" style="width: 12%;">
+            <col span="1" style="width: 12%;">
+            <col span="1" style="width: 20%;">
+            <col span="1" style="width: 12%;">
+            <col span="1" style="width: 12%;">
+            <col span="1" style="width: 12%;">
+         </colgroup>
+          <thead  style="font-size: 12px";>
+            <tr>
+              <th>Total Calls</th>
+              <th>Total Live Calls</th>
+              <th>Total Open Calls</th>
+              <th></th>
+              <th>Total Closed Calls</th>
+              <th>Total Target</th>
+              <th>Performance</th>
+            </tr>
+          </thead>
+          <tbody style="font-size: 12px";>
+            <tr>
+              <td>{{total_calls}}</td>
+              <td>{{total_live}}</td>
+              <td>{{total_open}}</td>
+              <td><button
+                type="button"
+                class="btn btn-secondary btn-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#Modal-AddResearch"
+              >
+                Add Research
+              </button></td>
+              <td>{{total_closed}}</td>
+              <td>{{total_target}}</td>
+              {% if total_closed > 0 %}
+              {% set performance = (total_target / total_closed)*100 %}
+              {% else %}
+              {% set performance = 00 %}
+              {% endif %}
+              <td>{{format_price( performance) }} %</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-3"></div>
+    </div>
+  </div>
+    <div class="mx-3">
+      <table class="table table-light table-striped table-sm tableFixHead analytic_tbl">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Script</th>
+            <th>Call</th>
+            <th>Entry Price</th>
+            <th>Stop_loss</th>
+            <th>Target</th>
+            <th>Call Validity</th>
+            <th>Analyst</th>
+            <th>Sl/Tgt</th>
+            <th>analyst_performance</th>
+            <th>Resource</th>
+            <th>Holdings</th>
+          </tr>
+        </thead>
+        <tbody>
+    
+          {% for rsrch in message.items %}
+          {% set outer_loop = loop %}
+          {% for hold in holdings %}
+          {% if outer_loop.index0 == loop.index0 %}
+          {% include 'includes/resource_modal.html' %}
+                        <tr>
+                          <td></td>
+                          <td>{{ rsrch.date.strftime('%d/%m/%y') }}</td>
+                          <td>{{ rsrch.script }}</td>
+                          <td>{{ rsrch.call }}</td>
+                          <td>{{ format_price(rsrch.price) }}</td>
+                          <td>{{ format_price(rsrch.stop_loss) }}</td>
+                          <td>{{ format_price(rsrch.target) }}</td>
+                          <td>{{ rsrch.call_validity }} days</td>
+                          <td>{{ rsrch.analyst }}</td>
+                          {% set analyst = rsrch.analyst %}
+                          <td>
+                            {% if rsrch.tgt_sl == "live" %}
+                            <form
+                              action="/stop_loss_target"
+                              method="POST"
+                              onchange="this.submit()"
+                            >
+                              {{ stoploss_target_forms.hidden_tag() }}
+                              <input type="hidden" name="date" value="{{ rsrch.date }}" />
+                              <input type="hidden" name="id" value="{{ rsrch.id }}" />
+                              <input type="hidden" name="script" value="{{ rsrch.script }}" />
+                              <input
+                                type="hidden"
+                                name="call_validity"
+                                value="{{ rsrch.call_validity }}"
+                              />
+                              <input type="hidden" name="analyst" value="{{ rsrch.analyst }}" />
+                              <select name="sl_target" class="form-select">
+                                <option value="">Select</option>
+                                <option value="target">Tgt_achieved</option>
+                                <option value="stoploss">SL_Triggered</option>
+                              </select>
+                              {% else %} {{ rsrch.tgt_sl }} {% endif %}
+                            </form>
+                          </td>
+                          
+                          <td style="width: 50px; height: 50px;">
+                            {% for a_data in ad %}
+                            {% if a_data.name == rsrch.analyst %}
+                              
+                              <table class="table table-bordered table-sm text-center">
+                                <thead style="font-size: 12px";>
+                                  <tr>
+                                    <th>calls</th>
+                                    <th>target</th>
+                                    <th>success %</th>
+                                  </tr>
+                                </thead>
+                                <tbody style="font-size: 10px";>
+                                  <tr>
+                                    <td>{{a_data.number_of_calls}}</td>
+                                    <td>{{a_data.target_achieved}}</td>
+                                    {% set success = a_data.performance %}
+                                    <td>{{ success }} %</td>
+                                  </tr>
+                                  {% set close = a_data.stop_loss_triggered + a_data.target_achieved %}
+                                  {% set open = a_data.number_of_calls - close %}
+                                  <p style="font-size: 10px";><small>open calls: {{open}} | closed calls: {{close}}</small></p>
+                                </tbody>
+                              </table>
+                            {% else %}
+                            {% endif %}
+                            {% endfor %}
+                          <td>
+                            <div style="width: 150px; height: 50px; overflow: auto">
+                              <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#resource-{{ rsrch.id }}">
+                                {{ rsrch.resource }}
+                              </button>
+                            </div>
+                          </td>
+                          {% if hold != None %}
+                        <form action="{{url_for('script_wise_holdings_page', page=1)}}", method="GET">
+                          <input type="hidden" name="data" value="{{ rsrch.script }}">
+                          <input type="hidden" name="caller" value="{{ caller }}">
+                          <input type="hidden" name="trading_code" value="{{ hold.trading_code }}">
+                          <input type="hidden" name="analyst" value="{{ analysts }}">
+                        <td><button type="submit">{{ hold }}</button></td>
+                        </form>
+                        {% else %}
+                        <td>None</td>
+                        {% endif %}
+                        </tr>
+                        
+            {% endif %} {% endfor %} {% endfor %}
+    
+    
+        </tbody>
+        
+      </table>
+      </div>
+      <div class="text-center paginated">
+        {% for page_num in message.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+            {% if page_num %}
+                {% if message.page == page_num %}
+                    <a class="btn btn-secondary mb-4" id="btn-secondary" href="{{ url_for('analyst_wise_analytics_page',analyst=analysts, page=page_num) }}">{{ page_num }}</a>
+                {% else %}
+                    <a class="btn btn-outline-secondary mb-4" href="{{ url_for('analyst_wise_analytics_page',analyst=analysts, page=page_num) }}">{{ page_num }}</a>
+                {% endif %}
+            {% else %}
+                ...
+            {% endif %}
+        {% endfor %}
+    </div>
+    </div>
+  {% endblock content %}
+  
+  <!-- functions for comma seprated digits -->
+  {%- macro format_price(price, thousand_separator=',', decimal_separator='.',
+  decimal_places=2) -%} {%- set price_as_string = price | string -%} {%- set
+  price_split = price_as_string.split('.') -%} {%- set price_integer =
+  price_split[0] -%} {%- if price_split | count > 1 -%} {%- set price_fraction =
+  price_split[1] -%} {%- if price_fraction | length < decimal_places -%} {%- set
+  price_fraction = price_fraction.ljust(decimal_places, '0') -%} {%- else -%}
+  {%- set price_fraction = price_fraction[:decimal_places] -%} {%- endif -%} {%-
+  else -%} {%- set price_fraction = '' -%} {%- endif -%} {%- set
+  formatted_price_integer = price_integer | reverse | batch(3) | map('join', '')
+  | join(thousand_separator) | reverse -%} {%- if price_fraction != '' -%} {%-
+  set formatted_price = formatted_price_integer ~ decimal_separator ~
+  price_fraction -%} {%- else -%} {%- set formatted_price =
+  formatted_price_integer-%} {%- endif -%} {{- formatted_price -}} {%- endmacro
+  -%}
+  

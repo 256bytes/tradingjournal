@@ -67,10 +67,11 @@
     </div>
     <hr>
 
+    {% set footer_message = False %}
     <div class="row mx-2"> <!--div second row starts-->
         <table class="table table-light table-striped table-sm">
             <thead>
-                <tr>
+                <tr Style="font-size:12px" >
                     <th class="scope">#</th>
                     <th class="scope">Broker Name</th>
                     <th class="scope">Trading Code</th>
@@ -92,7 +93,18 @@
                         {% if outer_loop.index0 == loop.index0 %}
                             <tr class="row_numbering">
                                 <td></td>
+                                
+                                {% if brokers.name == "Upstox" %}
+                                {% set footer_message = True %}
+                                <td>{{ brokers.name }}
+                                    <div>
+                                        <p Style="font-size:10px">Equity Delivery*
+                                            ₹20 or 2.5% (whichever is lower) per order on Stocks</p>
+                                    </div>
+                                </td>
+                                {% else %}
                                 <td>{{ brokers.name }}</td>
+                                {% endif %}
                                 <td>{{ brokers.trading_code }}</td>
                                 <td>{{ brokers.equity_delivery }}</td>
                                 <td>{{ brokers.equity_intraday }}</td>
@@ -105,7 +117,7 @@
                                     <button type="button" class="btn btn-outline-secodary btn-sm" data-bs-toggle="modal" data-bs-target="#addFunds-{{ item.id }}">
                                         Add Funds
                                     </button>
-                                    <button type="button" class="btn btn-outline-danger btn-sm" onClick="location.href='/delete_broker/{{brokers.id}}'">
+                                    <button type="button" class="btn btn-outline-danger btn-sm" onClick="location.href='/delete_broker/{{brokers.trading_code}}'">
                                         Del
                                     </button>
                                 </td>
@@ -116,6 +128,7 @@
                     </form>
                 </tbody>
         </table>
+
     </div><!--div second row ends -->
     <hr>
     <br>

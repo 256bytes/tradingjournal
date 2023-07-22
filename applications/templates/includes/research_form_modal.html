@@ -1,0 +1,93 @@
+<!-- Sell Modal -->
+<div
+  class="modal fade"
+  id="Modal-AddResearch"
+  tabindex="-1"
+  aria-labelledby="Modal-AddResearch"
+  aria-hidden="True"
+  style="opacity: 1 !important"
+>
+  <!--div modal fade starts-->
+  <div class="modal-dialog">
+    <!--div modal-dialog starts-->
+    <div class="modal-content">
+      <!--div modal-content starts-->
+      <div class="modal-header">
+        <!--div modal-header starts-->
+        <div class="text-center"><h5 class="modal-title">Add Your Research</h5></div>
+      </div>
+      <!--div modal-header ends-->
+      <div class="modal-body">
+        <form action="/analytics" method="POST">
+            <!--Form starts-->
+            {{ my_research_forms.hidden_tag() }}
+    
+            <tr>
+              <td>
+                {{ my_research_forms.script.label() }} {{
+                my_research_forms.script(class="form-control", id="script", autocomplete="off",
+                placeholder="Symbol") }}
+              </td>
+              <td>
+                <label for="{{ my_research_forms.call.id }}">Buy/Sell</label>
+                {{ my_research_forms.call(class="form-select")}}
+              </td>
+              <td>
+                {{ my_research_forms.price.label() }} {{
+                my_research_forms.price(class="form-control", autocomplete="off",
+                placeholder="Price") }}
+              </td>
+              <td>
+                {{ my_research_forms.stop_loss.label() }} {{
+                my_research_forms.stop_loss(class="form-control",
+                autocomplete="off", placeholder="Enter Stop Loss") }}
+              </td>
+              <td>
+                {{ my_research_forms.target.label() }} {{
+                my_research_forms.target(class="form-control", autocomplete="off",
+                placeholder="Enter Target") }}
+              </td>
+              <td>
+                {{ my_research_forms.call_validity.label() }} {{
+                my_research_forms.call_validity(class="form-control",
+                autocomplete="off", placeholder="Enter Number of Days to achieve the target") }}
+              </td>
+              <td>
+                {{ my_research_forms.analyst.label() }} {{
+                my_research_forms.analyst(class="form-control", id="r_analyst", autocomplete="off",
+                placeholder="Enter Analyst Name") }}
+              </td>
+              <td>
+                {{ my_research_forms.resource.label() }} {{
+                my_research_forms.resource(class="form-control", autocomplete="off",
+                placeholder="Resource") }}
+              </td>
+              <hr>
+              <td>
+                {{
+                my_research_forms.submit(class="btn btn-outline-secondary btn-sm")
+                }}
+              </td>
+            </tr>
+          </form>
+          <!--Form ends-->
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </form>
+        <!--form ends-->
+      </div>
+      <!--div modal-body ends-->
+    </div>
+    <!--div modal-content ends-->
+  </div>
+  <!--div modal-dialog ends-->
+</div>
+<!--div modal fade ends-->

@@ -1,237 +1,250 @@
-{% extends 'layout.html' %}
-{% block title %}Analytics{% endblock title %}
+{% extends 'layout.html' %} {% block title %}Analytics{% endblock title %} {%
+block content %}
 
-{% block content %}
-<div class='ms-3'>
-    <form  action = "/analysis_import" method = "POST" enctype = "multipart/form-data">
-        <input class="btn btn-outline-secondary btn-sm"  type = "file" name = "File" />
-        <input class="btn btn-outline-secondary btn-sm" type = "submit" value = "Import" />
-        <button class="btn btn-outline-secondary btn-sm" onclick="export_to_excel()" id="export_data">Export to xls</button>
-    </form>
-</div>
-<div class="table">
-    <table class="table table-dark table-striped table-sm text-center">
-        <thead>
-            <th colspan="2"><div class="float-start">
-                
-            </div></th>
+
+<div class="text-center">
+  {% include 'includes/research_form_modal.html' %}
+  <div class="row">
+    <div class="col-3"></div>
+    <div class="clear-fix col-6">
+      <table class="table table-bordered table-sm text-center" style="width: 100%">
+        <colgroup>
+          <col span="1" style="width: 12%;">
+          <col span="1" style="width: 12%;">
+          <col span="1" style="width: 20%;">
+          <col span="1" style="width: 12%;">
+          <col span="1" style="width: 12%;">
+       </colgroup>
+        <thead style="font-size: 12px";>
+          <tr>
+            <th>Total Calls</th>
+            <th>Total Live Calls</th>
             <th></th>
-            <th colspan="6"></th>
+            <th>Total Open Calls</th>
+            <th>Total Closed Calls</th>
+          </tr>
         </thead>
-        <tbody>
-            <form method="POST"> <!--Form starts-->
-                {{ my_research_forms.hidden_tag() }}
-
-                    <tr>
-                        <td>
-                            {{ my_research_forms.script.label() }}
-                            {{ my_research_forms.script(class="form-control", autocomplete="off", placeholder="Symbol") }}
-                        </td>
-                        <td>
-                            {{ my_research_forms.price.label() }}
-                            {{ my_research_forms.price(class="form-control", autocomplete="off", placeholder="Price") }}
-                        </td>
-                        <td>
-                            {{ my_research_forms.call.label() }}
-                            {{ my_research_forms.call(class="form-control", autocomplete="off", placeholder="Buy/Sell") }}
-                        </td>
-                        <td>
-                            {{ my_research_forms.stop_loss.label() }}
-                            {{ my_research_forms.stop_loss(class="form-control", autocomplete="off", placeholder="Enter Stop Loss") }}
-                        </td>
-                        <td>
-                            {{ my_research_forms.target.label() }}
-                            {{ my_research_forms.target(class="form-control", autocomplete="off", placeholder="Enter Target") }}
-                        </td>
-                        <td>
-                            {{ my_research_forms.time_frame.label() }}
-                            {{ my_research_forms.time_frame(class="form-control", autocomplete="off", placeholder="Enter Number of Days to achieve the target") }}
-                        </td>
-                        <td>
-                            {{ my_research_forms.analyst.label() }}
-                            {{ my_research_forms.analyst(class="form-control", autocomplete="off", placeholder="Enter Analyst Name") }}
-                        </td>
-                        <td>
-                            {{ my_research_forms.resource.label() }}
-                            {{ my_research_forms.resource(class="form-control", autocomplete="off", placeholder="Resource") }}
-                        </td>
-                        <td>
-                            {{ my_research_forms.submit.label() }}
-                            {{ my_research_forms.submit(class="btn btn-outline-secondary btn-sm") }}
-                        </td>
-                    </tr>
-            </form> <!--Form ends-->
+        <tbody style="font-size: 12px";>
+          <tr>
+            <td>{{total_calls}}</td>
+            <td>{{total_live}}</td>
+            <td><button
+              type="button"
+              class="btn btn-secondary btn-sm"
+              data-bs-toggle="modal"
+              data-bs-target="#Modal-AddResearch"
+            >
+              Add Research
+            </button></td>
+            <td>{{total_open}}</td>
+            <td>{{total_closed}}</td>
+          </tr>
         </tbody>
+      </table>
+    </div>
+    <div class="col-3"></div>
+  </div>
+
+  <hr />
+  <br />
+  <div class="mx-3">
+    <table
+      class="table table-light table-striped table-sm tableFixHead analytic_tbl"
+    >
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Date</th>
+          <th>Script</th>
+          <th>Call</th>
+          <th>Entry Price</th>
+          <th>Stop_loss</th>
+          <th>Target</th>
+          <th>Call Validity</th>
+          <th>Analyst</th>
+          <th>Sl/Tgt</th>
+          <th>analyst_performance</th>
+          <th>Resource</th>
+          <th>Holdings</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rsrch in research.items %} {% set outer_loop = loop %} {% for
+        hold in holdings %} {% if outer_loop.index0 == loop.index0 %} {%
+        include 'includes/resource_modal.html' %}
+        <tr>
+          <td></td>
+          <td>{{ rsrch.date.strftime('%d/%m/%y') }}</td>
+          <td>{{ rsrch.script }}</td>
+          <td>{{ rsrch.call }}</td>
+          <td>{{ format_price(rsrch.price) }}</td>
+          <td>{{ format_price(rsrch.stop_loss) }}</td>
+          <td>{{ format_price(rsrch.target) }}</td>
+          <td>{{ rsrch.call_validity }} days</td>
+          <td>{{ rsrch.analyst }}</td>
+          <td>
+            {% if rsrch.tgt_sl == "live" %}
+            <form
+              action="/stop_loss_target"
+              method="POST"
+              onchange="this.submit()"
+            >
+              {{ stoploss_target_forms.hidden_tag() }}
+              <input type="hidden" name="date" value="{{ rsrch.date }}" />
+              <input type="hidden" name="id" value="{{ rsrch.id }}" />
+              <input type="hidden" name="script" value="{{ rsrch.script }}" />
+              <input
+                type="hidden"
+                name="call_validity"
+                value="{{ rsrch.call_validity }}"
+              />
+              <input type="hidden" name="analyst" value="{{ rsrch.analyst }}" />
+              <select name="sl_target" class="form-select">
+                <option value="">Select</option>
+                <option value="target">Tgt_achieved</option>
+                <option value="stoploss">SL_Triggered</option>
+              </select>
+              {% else %} {{ rsrch.tgt_sl }} {% endif %}
+            </form>
+          </td>
+
+          <td style="width: 50px; height: 50px">
+            {% for a_data in ad %} {% if a_data.name == rsrch.analyst %}
+
+            <table class="table table-bordered table-sm text-center">
+              <thead style="font-size: 12px";>
+                <tr>
+                  <th>calls</th>
+                  <th>target</th>
+                  <th>success %</th>
+                </tr>
+              </thead>
+              <tbody style="font-size: 10px";>
+                <tr>
+                  <td>{{a_data.number_of_calls}}</td>
+                  <td>{{a_data.target_achieved}}</td>
+                  {% set success = a_data.performance %}
+                  <td>{{ success }} %</td>
+                </tr>
+                {% set close = a_data.stop_loss_triggered + a_data.target_achieved %}
+                {% set open = a_data.number_of_calls - close %}
+                <p style="font-size: 10px";><small>open calls: {{open}} | closed calls: {{close}}</small></p>
+              </tbody>
+            </table>
+            {% else %} {% endif %} {% endfor %}
+          </td>
+          <td>
+            <div style="width: 150px; height: 50px; overflow: auto">
+              <button
+                type="button"
+                class="btn btn-outline-warning btn-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#resource-{{ rsrch.id }}"
+              >
+                {{ rsrch.resource }}
+              </button>
+            </div>
+          </td>
+          {% if hold != None %}
+          <form action="{{url_for('script_wise_holdings_page', page=1)}}" , method="GET">
+            <input type="hidden" name="data" value="{{ rsrch.script }}" />
+            <td><button type="submit">{{ hold }}</button></td>
+          </form>
+          {% else %}
+          <td>None</td>
+          {% endif %}
+        </tr>
+
+        {% endif %} {% endfor %} {% endfor %}
+      </tbody>
     </table>
-</div>
+    <div class="text-center paginated">
+      {% for page in research.iter_pages(left_edge=1, right_edge=1,
+      left_current=1, right_current=2) %} {% if page %} {% if research.page ==
+      page %}
+      <a
+        class="btn btn-secondary mb-4"
+        id="btn-current"
+        href="{{ url_for('analytics_page', page=page) }}"
+        >{{ page }}</a
+      >
+      {% else %}
+      <a
+        class="btn btn-outline-secondary mb-4"
+        href="{{ url_for('analytics_page', page=page) }}"
+        >{{ page }}</a
+      >
+      {% endif %} {% else %} ... {% endif %} {% endfor %}
+    </div>
+  </div>
 
-<div class="mx-3">
-    <table class="table table-light table-striped table-sm tableFixHead">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Date</th>
-                <th>Script</th>
-                <th>Price</th>
-                <th>Call</th>
-                <th>Stop_loss</th>
-                <th>Target</th>
-                <th>Time_Frame</th>
-                <th>Analyst</th>
-                <th>Sl/Tgt</th>
-                <th>Performance</th>
-                <th>Resource</th>
-                <th>Holdings</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for analytic in analysis.items %}
-            {% set outer_loop = loop %}
-                {% for hold in chk_holdings %}
-                    {% if outer_loop.index0 == loop.index0 %}
-            {% include 'includes/resource_modal.html' %}
-                        <form action="/delete_analysis" method='POST'>
-                            <tr>
-                                <td></td>
-                                <td>{{ analytic.date.strftime('%d/%m/%y') }}</td>
-                                <td>{{ analytic.script }}</td>
-                                <td>{{ format_price(analytic.price) }}</td>
-                                <td>{{ analytic.call }}</td>
-                                <td>{{ format_price(analytic.stop_loss) }}</td>
-                                <td>{{ format_price(analytic.target) }}</td>
-                                <td>{{ analytic.time_frame }} days</td>
-                                <td>{{ analytic.analyst }}</td>
-                                <td>todo</td>
-                                <td>performance</td>
-                                <td>
-                                    <div style="width: 300px; height: 50px; overflow: auto">
-                                        <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#resource-{{ analytic.id }}">
-                                            {{ analytic.resource }}
-                                        </button>
-                                    </div>
-                                </td>
-                                <td>{{ hold.holding }}</td>
-                                <td><input class="btn btn-sm btn-outline-secondary" type=button onClick="location.href='/delete_analysis/{{analytic.id}}'" value='Delete'></td>
-                            </tr>
-                        </form>
-                    {% endif %}
-                {% endfor %}
-            {% endfor %}
-        </tbody>
-    </table>
-        <div class="text-center paginated">
-            {% for page in analysis.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-                {% if page %}
-                    {% if analysis.page == page %}
-                        <a class="btn btn-secondary mb-4" id="btn-current" href="{{ url_for('analytics_page', page=page) }}">{{ page }}</a>
-                    {% else %}
-                        <a class="btn btn-outline-secondary mb-4" href="{{ url_for('analytics_page', page=page) }}">{{ page }}</a>
-                    {% endif %}
-                {% else %}
-                    ...
-                {% endif %}
-            {% endfor %}
-        </div>
-</div>
-
-    <div > <!--div col starts-->
-        
-
-            <!-- Script to export the table in excel format
-            <script>
-                var fl = document.getElementById('id_excel');
-                fl.onchange = function(e){ 
-                    var ext = this.value.match(/\.(.+)$/)[1];
-                    switch(ext)
-                    {
-                        case 'xls':
-                        case 'xlsx':
-                            alert('allowed');
-                            break;
-                        default:
-                            alert('not allowed');
-                            this.value='';
-                    }
-                };
-            </script>-->
-            
-    </div> <!--div col ends-->
-<div class="row"> <!--div second row ends (table)-->
-
-
+  <!--div col ends-->
+  <div class="row">
+    <!--div second row ends (table)-->
 
     <div hidden>
-        <table class="table table-dark table-striped table-sm tableFixHead" id="data">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Date</th>
-                    <th>Script</th>
-                    <th>Price</th>
-                    <th>Call</th>
-                    <th>Stop_loss</th>
-                    <th>Target</th>
-                    <th>Time_Frame</th>
-                    <th>Analyst</th>
-                    <th>Sl/Tgt</th>
-                    <th>Performance</th>
-                    <th>Resource</th>
-                    <th>Holdings</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for analytic in analysis.items %}
-                {% set outer_loop = loop %}
-                    {% for hold in chk_holdings %}
-                        {% if outer_loop.index0 == loop.index0 %}
-                {% include 'includes/resource_modal.html' %}
-                            <form action="/delete_analysis" method='POST'>
-                                <tr>
-                                    <td></td>
-                                    <td>{{ analytic.date }}</td>
-                                    <td>{{ analytic.script }}</td>
-                                    <td>{{ format_price(analytic.price) }}</td>
-                                    <td>{{ analytic.call }}</td>
-                                    <td>{{ format_price(analytic.stop_loss) }}</td>
-                                    <td>{{ format_price(analytic.target) }}</td>
-                                    <td>{{ analytic.time_frame }} days</td>
-                                    <td>{{ analytic.analyst }}</td>
-                                    <td>todo</td>
-                                    <td>performance</td>
-                                    <td>
-                                        {{ analytic.resource }}
-                                    </td>
-                                    <td>{{ hold.holding }}</td>
-                                </tr>
-                            </form>
-                        {% endif %}
-                    {% endfor %}
-                {% endfor %}
-            </tbody>
-        </table>
+      <table
+        class="table table-dark table-striped table-sm tableFixHead"
+        id="data"
+      >
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Script</th>
+            <th>Price</th>
+            <th>Call</th>
+            <th>Stop_loss</th>
+            <th>Target</th>
+            <th>call_validity</th>
+            <th>Analyst</th>
+            <th>Sl/Tgt</th>
+            <th>Performance</th>
+            <th>Resource</th>
+            <th>Holdings</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rsrch in research.items %} {% set outer_loop = loop %} {% for
+          hold in holdings %} {% if outer_loop.index0 == loop.index0 %} {%
+          include 'includes/resource_modal.html' %}
+          <form action="/delete_analysis" method="POST">
+            <tr>
+              <td></td>
+              <td>{{ rsrch.date }}</td>
+              <td>{{ rsrch.script }}</td>
+              <td>{{ format_price(rsrch.price) }}</td>
+              <td>{{ rsrch.call }}</td>
+              <td>{{ format_price(rsrch.stop_loss) }}</td>
+              <td>{{ format_price(rsrch.target) }}</td>
+              <td>{{ rsrch.call_validity }} days</td>
+              <td>{{ rsrch.analyst }}</td>
+              <td>todo</td>
+              <td>performance</td>
+              <td>{{ rsrch.resource }}</td>
+              <td>{{ hold.holding }}</td>
+            </tr>
+          </form>
+          {% endif %} {% endfor %} {% endfor %}
+        </tbody>
+      </table>
     </div>
-{% endblock content %}
+    {% endblock content %}
 
-<!-- functions for comma seprated digits -->
-{%- macro format_price(price, thousand_separator=',', decimal_separator='.', decimal_places=2) -%}
-{%- set price_as_string = price | string -%}
-{%- set price_split = price_as_string.split('.') -%}
-{%- set price_integer = price_split[0] -%}
-{%- if price_split | count > 1 -%}
-{%- set price_fraction = price_split[1] -%}
-{%- if price_fraction | length < decimal_places -%}
-{%- set price_fraction = price_fraction.ljust(decimal_places, '0') -%} 
-{%- else -%}
-{%- set price_fraction = price_fraction[:decimal_places] -%}
-{%- endif -%}
-{%- else -%}
-{%- set price_fraction = '' -%}
-{%- endif -%}
-{%- set formatted_price_integer = price_integer | reverse | batch(3) | map('join', '') | join(thousand_separator) | reverse -%}
-{%- if price_fraction != '' -%}
-{%- set formatted_price = formatted_price_integer ~ decimal_separator ~ price_fraction -%}
-{%- else -%}
-{%- set formatted_price = formatted_price_integer-%}
-{%- endif -%}
-{{- formatted_price -}} {%- endmacro -%}
+    <!-- functions for comma seprated digits -->
+    {%- macro format_price(price, thousand_separator=',', decimal_separator='.',
+    decimal_places=2) -%} {%- set price_as_string = price | string -%} {%- set
+    price_split = price_as_string.split('.') -%} {%- set price_integer =
+    price_split[0] -%} {%- if price_split | count > 1 -%} {%- set price_fraction
+    = price_split[1] -%} {%- if price_fraction | length < decimal_places -%} {%-
+    set price_fraction = price_fraction.ljust(decimal_places, '0') -%} {%- else
+    -%} {%- set price_fraction = price_fraction[:decimal_places] -%} {%- endif
+    -%} {%- else -%} {%- set price_fraction = '' -%} {%- endif -%} {%- set
+    formatted_price_integer = price_integer | reverse | batch(3) | map('join',
+    '') | join(thousand_separator) | reverse -%} {%- if price_fraction != '' -%}
+    {%- set formatted_price = formatted_price_integer ~ decimal_separator ~
+    price_fraction -%} {%- else -%} {%- set formatted_price =
+    formatted_price_integer-%} {%- endif -%} {{- formatted_price -}} {%-
+    endmacro -%}
+  </div>
+</div>

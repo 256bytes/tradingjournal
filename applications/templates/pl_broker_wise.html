@@ -1,0 +1,49 @@
+{% extends 'layout.html' %}
+{% block title %}Brokers P&L {% endblock title %}
+{% block content %}
+<div class="container">
+    <table class="table table-light table-striped table-sm table-bordered bw_pl">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Broker</th>
+                <th>Trading Code</th>
+                <th class="float-column">Net Profit Loss</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in message %}
+            <tr>
+                <td>#</td>
+                <td>{{data.broker_name}}</td>
+                <td>{{data.trading_code}}</td>
+                <td class="{{"grey" if data.net_profit_loss == 0 else ("green" if data.net_profit_loss > 0 else "red")}} float-column">{{format_price(data.net_profit_loss | abs)}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}
+
+
+{%- macro format_price(price, thousand_separator=',', decimal_separator='.', decimal_places=2) -%}
+{%- set price_as_string = price | string -%}
+{%- set price_split = price_as_string.split('.') -%}
+{%- set price_integer = price_split[0] -%}
+{%- if price_split | count > 1 -%}
+{%- set price_fraction = price_split[1] -%}
+{%- if price_fraction | length < decimal_places -%}
+{%- set price_fraction = price_fraction.ljust(decimal_places, '0') -%} 
+{%- else -%}
+{%- set price_fraction = price_fraction[:decimal_places] -%}
+{%- endif -%}
+{%- else -%}
+{%- set price_fraction = '' -%}
+{%- endif -%}
+{%- set formatted_price_integer = price_integer | reverse | batch(3) | map('join', '') | join(thousand_separator) | reverse -%}
+{%- if price_fraction != '' -%}
+{%- set formatted_price = formatted_price_integer ~ decimal_separator ~ price_fraction -%}
+{%- else -%}
+{%- set formatted_price = formatted_price_integer-%}
+{%- endif -%}
+{{- formatted_price -}} {%- endmacro -%}

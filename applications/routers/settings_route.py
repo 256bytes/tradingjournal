@@ -4,22 +4,25 @@ from sqlalchemy import update
 
 #-------------User Packages --------------------#
 from applications import app
-from applications.forms import UpdateForm, AddFunds, DeleteMyAccount
-from applications.models import Brokers, Users, Taxes
-from applications.database import db
 
 
 @app.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings_page():
 
+    #-------------User Packages --------------------#
+    from applications.forms import UpdateForm, AddFunds, DeleteMyAccount
+    from applications.models import Brokers, Users, Taxes
+    from applications.database import db
+
     delete_my_account = DeleteMyAccount()
+    add_funds_form = AddFunds()
+    update_form = UpdateForm()
+    
     users = Users.query.filter_by(id=current_user.id)
     taxes = Taxes.query.all()
     broker_query = Brokers.query.filter_by(user_id=current_user.id)
     broker_data = Brokers.query.filter(Brokers.user_id == current_user.id).all()
-    add_funds_form = AddFunds()
-    update_form = UpdateForm()
     brokers_id = request.form.get('brokers_id')
 
     if request.method == "POST":

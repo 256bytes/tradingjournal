@@ -1,0 +1,330 @@
+<!-- Sell Modal -->
+<div
+  class="modal fade"
+  id="Modal-Sell-{{ holding.script }}"
+  tabindex="-1"
+  aria-labelledby="Modal-Sell"
+  aria-hidden="True"
+  style="opacity: 1 !important"
+>
+  <!--div modal fade starts-->
+  <div class="modal-dialog">
+    <!--div modal-dialog starts-->
+    <div class="modal-content">
+      <!--div modal-content starts-->
+      <div class="modal-header">
+        <!--div modal-header starts-->
+        <div><h5 class="modal-title">Sell Shares</h5></div>
+      </div>      
+      <div class="modal-header">
+        <!--div modal-header starts-->
+        <h5 class="modal-title">Script: {{ holding.script }}</h5>
+        <h5 class="modal-title">Trading_Account: {{ holding.trading_code }}</h5>
+      </div>
+      <!--div modal-header ends-->
+      <div class="modal-body">
+        <form action="/sell" method="POST">
+          <!--form starts-->
+          {{ sell_form.hidden_tag() }}
+          <div>
+            {% for sd in stock_data %} {% if sd.script == holding.script and
+            sd.total_qty > 0 %}
+            <div>
+              <p>Account Number: {{ sd.trading_code }}</p>
+              <input
+                type="hidden"
+                class="form-control"
+                name="script"
+                value="{{ sd.script }}"
+              />
+              <input
+                type="hidden"
+                class="form-control"
+                name="shares_held"
+                value="{{ sd.total_qty }}"
+              />
+              <p>Shares held: {{ sd.total_qty }}</p>
+            </div>
+            <hr />
+            {% endif %} {% endfor %}
+          </div>
+
+          <hr />
+          <div class="mb-3">
+            <label class="col-form-label">Select an Account to sell</label>
+            <select name="code" class="form-control">
+              {% for t in stock_data %} {% if t.script == holding.script and
+              t.total_qty > 0 %}
+              <option>{{ t.trading_code }}</option>
+              {% endif %} {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            {{ sell_form.quantity.label() }} {{
+            sell_form.quantity(class="form-control", autocomplete="off",
+            placeholder="Enter number of shares to sell") }}
+          </div>
+          <div class="mb-3">
+            {{ sell_form.price.label() }} {{
+            sell_form.price(class="form-control", autocomplete="off",
+            placeholder="Price") }}
+          </div>
+          <hr />
+          <div class="modal-footer">
+            <input type="hidden" class="form-control" name="sell_from" />
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+              Sell
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </form>
+        <!--form ends-->
+      </div>
+      <!--div modal-body ends-->
+    </div>
+    <!--div modal-content ends-->
+  </div>
+  <!--div modal-dialog ends-->
+</div>
+<!--div modal fade ends-->
+
+
+
+
+
+<!-- Buy Modal -->
+<div
+  class="modal fade"
+  id="Modal-Buy-{{ holding.script }}"
+  tabindex="-1"
+  aria-labelledby="Modal-Buy"
+  aria-hidden="true"
+>
+  <!--div modal fade starts-->
+  <div class="modal-dialog">
+    <!--div modal-dialog starts-->
+    <div class="modal-content">
+      <!--div modal-content starts-->
+      <div class="modal-header">
+        <!--div modal-header starts-->
+        <div><h5 class="modal-title">Buy Shares</h5></div>
+      </div>      
+      <div class="modal-header">
+        <!--div modal-header starts-->
+        <h5 class="modal-title">Script: {{ holding.script }}</h5>
+        <h5 class="modal-title">Trading_Account: {{ holding.trading_code }}</h5>
+      </div>
+      <!--div modal-header ends-->
+      <div class="modal-body">
+        <!--div modal-body starts-->
+
+        <form action="/buy" method="POST">
+          <!--form starts-->
+          {{ add_form.hidden_tag() }}
+
+          <div class="mb-3">
+            <input
+              type="hidden"
+              class="form-control"
+              name="symbol"
+              value="{{ holding.script }}"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="col-form-label">Quantity</label>
+            <input
+              type="hidden"
+              class="form-control"
+              name="shares_held"
+              value="{{ holding.net_qty }}"
+            />
+            <input
+              type="text"
+              class="form-control"
+              name="quantity"
+              value="{{ holding.net_qty }}"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="col-form-label">Price</label>
+            {% if (holding.net_qty | int) > 0 %} {% set avg = holding.avg_cost %} {%
+            else %} {% set avg = 0 %} {% endif %}
+
+            <input
+              type="hidden"
+              class="form-control"
+              name="old_price"
+              value="{{ value }}"
+            />
+            <input
+              type="text"
+              class="form-control"
+              name="price"
+              value="{{ value }}"
+              placeholder="Prev Close: {{ holding.current_price }}"
+            />
+          </div>
+
+          <div class="mb-3">
+            <input
+              type="hidden"
+              class="form-control"
+              name="code"
+              value="{{ holding.trading_code }}"
+            />
+          </div>
+
+          <div class="modal-footer">
+            <input
+              type="hidden"
+              class="form-control"
+              name="shares_to_add"
+              value="{{ holding.net_qty }}"
+            />
+            {{ add_form.submit(class="btn btn-outline-danger btn-sm") }}
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </form>
+        <!--form ends-->
+      </div>
+      <!--div modal-body ends-->
+    </div>
+    <!--div modal-content ends -->
+  </div>
+  <!--div modal-dialog ends-->
+</div>
+<!--div modal fade ends-->
+
+
+<!-- Add Bonus Modal -->
+<div
+  class="modal fade"
+  id="Modal-Add-{{ holding.script }}"
+  tabindex="-1"
+  aria-labelledby="Modal-Add"
+  aria-hidden="true"
+>
+  <!--div modal fade starts-->
+  <div class="modal-dialog">
+    <!--div modal-dialog starts-->
+    <div class="modal-content">
+      <!--div modal-content starts -->
+      <div class="modal-header">
+        <!--div modal-header start-->
+        <div><h5 class="modal-title">Script: {{ holding.script }}</h5></div>
+        <div><h5 class="modal-title">Add Bonus net_qty</h5></div>
+      </div>
+      <!--div modal-header ends-->
+      <div class="modal-body">
+        <!--div modal-body starts-->
+
+        <form action="/add_bonus" method="POST">
+          <!--form starts-->
+          {{ add_bonus.hidden_tag() }}
+
+          <div>
+            {% for sd in stock_data %} {% if sd.script == holding.script and
+            sd.total_qty > 0 %}
+            <div>
+              <p>Account Number: {{ sd.trading_code }}</p>
+              <input
+                type="hidden"
+                class="form-control"
+                name="script"
+                value="{{ sd.script }}"
+              />
+              <input
+                type="hidden"
+                class="form-control"
+                name="tc"
+                value="{{ sd.trading_code }}"
+              />
+              <input
+                type="hidden"
+                class="form-control"
+                name="shares_held"
+                value="{{ sd.total_qty }}"
+              />
+              <p>net_qty held:{{ sd.total_qty }}</p>
+            </div>
+            <hr />
+            {% endif %} {% endfor %}
+          </div>
+
+          <hr />
+
+          <div class="mb-3">
+            <label class="col-form-label">Select an Account to Add Bonus</label>
+            <select name="code" class="form-control">
+              {% for t in stock_data %} {% if t.script == holding.script and
+              t.total_qty > 0 %}
+              <option>{{ t.trading_code }}</option>
+              {% endif %} {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="col-form-label">Quantity</label>
+            <input
+              type="text"
+              class="form-control"
+              name="add_bonus"
+              placeholder="Enter number of shares to Add"
+              required="True"
+            />
+          </div>
+
+          <hr />
+
+          <div class="modal-footer">
+            <input type="hidden" class="form-control" name="add_bonus" />
+            <button type="submit" class="btn btn-outline-secondary btn-sm">
+              Add Bonus
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </form>
+        <!--form ends-->
+      </div>
+      <!--div modal-body ends-->
+    </div>
+    <!--div modal-content ends -->
+  </div>
+  <!--div modal-dialog ends-->
+</div>
+<!--div modal fade ends-->
+
+
+{%- macro format_price(price, thousand_separator=',', decimal_separator='.',
+decimal_places=2) -%} {%- set price_as_string = price | string -%} {%- set
+price_split = price_as_string.split('.') -%} {%- set price_integer =
+price_split[0] -%} {%- if price_split | count > 1 -%} {%- set price_fraction =
+price_split[1] -%} {%- if price_fraction | length < decimal_places -%} {%- set
+price_fraction = price_fraction.ljust(decimal_places, '0') -%} {%- else -%} {%-
+set price_fraction = price_fraction[:decimal_places] -%} {%- endif -%} {%- else
+-%} {%- set price_fraction = '' -%} {%- endif -%} {%- set
+formatted_price_integer = price_integer | reverse | batch(3) | map('join', '') |
+join(thousand_separator) | reverse -%} {%- if price_fraction != '' -%} {%- set
+formatted_price = formatted_price_integer ~ decimal_separator ~ price_fraction
+-%} {%- else -%} {%- set formatted_price = formatted_price_integer-%} {%- endif
+-%} {{- formatted_price -}} {%- endmacro -%}

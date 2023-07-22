@@ -58,3 +58,127 @@ nav{
 .green {
     color: #3c9401;
 }
+.grey {
+  color:grey;
+}
+
+/* Aligning the logo and title horizontally */
+.logo_nav {
+    display: flex;
+    align-items: center;
+  }
+
+#preloader{
+    background: whitesmoke url(/static/images/preloader_animation.gif) no-repeat center center;
+    height: 80vh;
+    width: 100%;
+    position: fixed;
+    z-index: 100;
+}
+
+#loader {
+    border: 16px solid #f3f3f3; /* Light grey */
+    border-top: 16px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+/*Invoice Table text-align */
+#invoice td:nth-child(1){
+    text-align: left;
+    font-size: 14px;
+}
+#invoice td:nth-child(2){
+    text-align: right;
+    font-size: 14px;
+
+}
+
+.invoice_row{
+    display: flex;
+}
+
+.left-div{
+    flex: 1;
+    background: slategrey;
+}
+
+.right-div{
+    flex: 1;
+    background: #adacac;
+}
+
+.bottom_line-div{
+    border: #adacac;
+}
+
+.acs_form{
+    background: #3c9401;
+}
+
+.ui-autocomplete {
+    background-color: gray;
+    border: 1px solid #ccc;
+    color: #f3f3f3;
+    z-index: 1;
+  }
+
+  .ui-menu-item {
+    cursor: pointer;
+  }
+  
+  .ui-menu-item:hover {
+    background-color: #f1f1f1;
+    color: orange;
+  }
+  
+  .float-column{
+    text-align: right;
+  }
+
+  table.sw_hold,
+  table.bw_hold,
+  table.bw_pl,
+  table.sw_pl,
+  table.analytic_tbl{
+    width: 100%;
+    font-size: medium;
+  }
+
+
+  table.sw_hold td:nth-child(1),
+  table.sw_hold td:nth-child(4),
+  table.sw_hold td:nth-child(6),
+  table.sw_hold td:nth-child(7){
+    width: 5%;
+  }
+
+  table.bw_hold td:nth-child(1),
+  table.bw_hold td:nth-child(3),
+  table.bw_hold td:nth-child(5),
+  table.bw_hold td:nth-child(6){
+    width: 5%;
+  }
+  table.hld_values{
+    width: fit-content;
+  }
+
+table.bordered{
+  color: #222222;
+}
+
+table.analytic_tbl td:nth-child(10){
+  width: 10%;
+}
+
+.modal{
+  background: #ffffff;
+}
+

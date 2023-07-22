@@ -1,0 +1,80 @@
+{% extends 'layout.html' %}
+{% block title %}ScriptWise P&L{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <table class="table table-light table-striped table-sm table-bordered sw_pl">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Account</th>
+                <th>Script</th>
+                <th class="float-column">Net Profit Loss</th>
+                <th class="float-column">Number of Transactions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set ns = namespace(net = 0.0) %}
+            {% set ns.net = 0.0 %}
+                {% for data in holdings %}
+                <tr>
+                    <td></td>
+                    <td>{{ data.trading_code }}</td>
+                    <td>{{ data.script }}</td>
+                    <td class="{{"green" if(data.net_profit_loss > 0 ) == True else "red"}} float-column">{{ format_price(data.net_profit_loss |abs) }}</td>
+                    <td class="float-column">{{data.number_of_transactions}}</td>
+                    {% set ns.net = ns.net +  data.net_profit_loss %}
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td></td>
+                    <td class="float-column" colspan="2" >Net Gain/Loss: </td>
+                    <td class="{{ "green" if (total_gain_loss > 0 ) == True else "red"}} float-column" >{{ format_price(total_gain_loss |abs) }}</td>
+                </tr>
+        </tbody>
+    </table>
+
+</div>
+<!-- Pagination links -->
+<div class="pagination justify-content-center">
+    {% if page > 1 %}
+        <a class="btn btn-outline-secondary mb-4" href="{{ url_for('pl_script_wise_page', page=page-1) }}">Previous</a>
+    {% endif %}
+    {% for num in calculate_page_range(page, total_pages) %}
+        {% if num == page %}
+            <span class="current-page btn btn-secondary mb-4">{{ num }}</span>
+        {% else %}
+            <a class="btn btn-outline-secondary mb-4" href="{{ url_for('pl_script_wise_page', page=num) }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    {% if page < total_pages - 1 %}
+        ...
+        <a class="btn btn-outline-secondary mb-4" href="{{ url_for('pl_script_wise_page', page=total_pages) }}">{{ total_pages }}</a>
+    {% endif %}
+    {% if page < total_pages %}
+        <a class="btn btn-outline-secondary mb-4" href="{{ url_for('pl_script_wise_page', page=page+1) }}">Next</a>
+    {% endif %}
+</div>
+{% endblock content %}
+
+{%- macro format_price(price, thousand_separator=',', decimal_separator='.', decimal_places=2) -%}
+{%- set price_as_string = price | string -%}
+{%- set price_split = price_as_string.split('.') -%}
+{%- set price_integer = price_split[0] -%}
+{%- if price_split | count > 1 -%}
+{%- set price_fraction = price_split[1] -%}
+{%- if price_fraction | length < decimal_places -%}
+{%- set price_fraction = price_fraction.ljust(decimal_places, '0') -%} 
+{%- else -%}
+{%- set price_fraction = price_fraction[:decimal_places] -%}
+{%- endif -%}
+{%- else -%}
+{%- set price_fraction = '' -%}
+{%- endif -%}
+{%- set formatted_price_integer = price_integer | reverse | batch(3) | map('join', '') | join(thousand_separator) | reverse -%}
+{%- if price_fraction != '' -%}
+{%- set formatted_price = formatted_price_integer ~ decimal_separator ~ price_fraction -%}
+{%- else -%}
+{%- set formatted_price = formatted_price_integer-%}
+{%- endif -%}
+{{- formatted_price -}} {%- endmacro -%}
